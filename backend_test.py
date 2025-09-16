@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Backend API Testing Suite for WhatsApp Sticker Admin Panel
-Tests authentication, admin profile, unified stickers, and Firebase configuration endpoints
+Backend API Testing Suite for WhatsApp Sticker Package Manager
+Tests authentication, package CRUD operations, popularity system, social media, and Firebase configuration endpoints
 """
 
 import requests
