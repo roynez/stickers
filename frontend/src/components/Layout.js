@@ -30,7 +30,7 @@ export default function Layout({ children }) {
     { name: 'Categorías', href: '/categories', icon: FolderOpen },
     { name: 'Paquetes', href: '/packages', icon: Sticker, badge: 'Nuevo' },
     { name: 'Suscripciones', href: '/subscriptions', icon: Crown, badge: 'Premium' },
-    { name: 'Banners', href: '/banners', icon: Banknote, badge: 'Promo' },
+    { name: 'Banners', href: '/horizontal-banners', icon: Banknote, badge: 'Slider' },
     { name: 'Notificaciones', href: '/notifications', icon: Bell, badge: 'Push' },
     { name: 'Redes Sociales', href: '/social-media', icon: Users, badge: 'Social' },
     { name: 'Sistema', href: '/system-config', icon: Cog, badge: 'Config' },
