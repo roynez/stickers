@@ -85,13 +85,6 @@ function AppContent() {
             </Layout>
           </ProtectedRoute>
         } />
-        <Route path="/subcategories" element={
-          <ProtectedRoute>
-            <Layout>
-              <SubCategories />
-            </Layout>
-          </ProtectedRoute>
-        } />
         <Route path="/packages" element={
           <ProtectedRoute>
             <Layout>
