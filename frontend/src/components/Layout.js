@@ -32,7 +32,7 @@ export default function Layout({ children }) {
     { name: 'Suscripciones', href: '/subscriptions', icon: Crown, badge: 'Premium' },
     { name: 'Banners', href: '/banners', icon: Banknote, badge: 'Promo' },
     { name: 'Notificaciones', href: '/notifications', icon: Bell, badge: 'Push' },
-    { name: 'Redes Sociales', href: '/social-media', icon: User, badge: 'Social' },
+    { name: 'Redes Sociales', href: '/social-media', icon: Users, badge: 'Social' },
     { name: 'Sistema', href: '/system-config', icon: Cog, badge: 'Config' },
     { name: 'Configuración', href: '/settings', icon: Settings },
     { name: 'Perfil Admin', href: '/admin-profile', icon: User, badge: 'Admin' },
