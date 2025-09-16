@@ -823,8 +823,8 @@ class BackendTester:
             return False
     
     def run_all_tests(self):
-        """Run all backend tests"""
-        print(f"🚀 Starting Backend API Tests for {BACKEND_URL}")
+        """Run all backend tests for package-based system"""
+        print(f"🚀 Starting Backend Package System Tests for {BACKEND_URL}")
         print("=" * 60)
         
         # Initialize admin first
@@ -837,9 +837,25 @@ class BackendTester:
             self.test_admin_profile_update()
             self.test_change_password()
             
-            # Test unified stickers endpoints
-            self.test_unified_stickers_get()
-            self.test_unified_stickers_create()
+            # Test category creation (needed for packages)
+            self.test_categories_create()
+            
+            # Test package CRUD operations
+            self.test_packages_get()
+            self.test_packages_create()
+            self.test_packages_update()
+            
+            # Test individual sticker management within packages
+            self.test_sticker_management()
+            
+            # Test popularity system (likes and downloads)
+            self.test_popularity_system()
+            
+            # Test social media configuration
+            self.test_social_media_config()
+            
+            # Test dashboard stats with package-based metrics
+            self.test_dashboard_stats()
             
             # Test Firebase configuration
             self.test_firebase_instructions()
@@ -848,8 +864,8 @@ class BackendTester:
             # Test system configuration
             self.test_system_config()
             
-            # Test dashboard
-            self.test_dashboard_stats()
+            # Cleanup - delete test package
+            self.test_packages_delete()
         else:
             print("❌ Authentication failed - skipping authenticated tests")
         
