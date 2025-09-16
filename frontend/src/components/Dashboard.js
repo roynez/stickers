@@ -130,74 +130,209 @@ export default function Dashboard() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {statCards.map((stat, index) => (
-          <div key={index} className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+          <div key={index} className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">{stat.title}</p>
-                <p className="text-3xl font-bold text-gray-900 mt-2">{stat.value}</p>
+                <p className="text-3xl font-bold text-gray-900 mt-2">{stat.value.toLocaleString()}</p>
+                {stat.change && (
+                  <p className="text-xs text-gray-500 mt-1">{stat.change}</p>
+                )}
               </div>
               <div className={`p-3 rounded-xl ${stat.bgColor}`}>
-                <stat.icon className={`h-6 w-6 ${stat.textColor}`} />
+                <stat.icon className={`h-6 w-6 ${stat.color}`} />
               </div>
             </div>
           </div>
         ))}
       </div>
 
-      {/* Platform Breakdown */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* iOS Stats */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <Smartphone className="h-5 w-5 text-blue-600" />
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900">iOS</h3>
-                <p className="text-sm text-gray-600">Stickers para iPhone</p>
-              </div>
+      {/* Top Popular Packages */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-gradient-to-r from-orange-100 to-red-100 rounded-lg">
+              <Fire className="h-6 w-6 text-red-600" />
             </div>
-          </div>
-          
-          <div className="space-y-3">
-            <div className="flex justify-between items-center">
-              <span className="text-gray-600">Total Stickers</span>
-              <span className="font-semibold text-gray-900">{stats?.total_stickers_ios || 0}</span>
-            </div>
-            <div className="w-full bg-gray-200 rounded-full h-2">
-              <div 
-                className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-                style={{ 
-                  width: stats?.total_stickers > 0 
-                    ? `${((stats?.total_stickers_ios || 0) / stats.total_stickers) * 100}%` 
-                    : '0%' 
-                }}
-              ></div>
+            <div>
+              <h3 className="text-xl font-semibold text-gray-900">📈 Paquetes Más Populares</h3>
+              <p className="text-sm text-gray-600">Ordenados por algoritmo de popularidad</p>
             </div>
           </div>
         </div>
 
-        {/* Android Stats */}
+        {popularPackages.length > 0 ? (
+          <div className="space-y-4">
+            {popularPackages.map((pkg, index) => (
+              <div key={pkg.package_id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center justify-center w-8 h-8 bg-white rounded-full border-2 border-gray-200 font-bold text-gray-700">
+                    #{index + 1}
+                  </div>
+                  
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h4 className="text-lg font-semibold text-gray-900">{pkg.package_name}</h4>
+                      {getPopularityIcon(pkg.popularity_rank)}
+                      <span className="text-sm text-gray-600">{pkg.popularity_rank}</span>
+                    </div>
+                    <p className="text-sm text-gray-600">{pkg.category_name}</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-6 text-sm">
+                  <div className="text-center">
+                    <div className="flex items-center gap-1 text-red-500">
+                      <Heart className="h-4 w-4" />
+                      <span className="font-semibold">{pkg.likes_count}</span>
+                    </div>
+                    <span className="text-gray-500">likes</span>
+                  </div>
+                  
+                  <div className="text-center">
+                    <div className="flex items-center gap-1 text-blue-500">
+                      <Download className="h-4 w-4" />
+                      <span className="font-semibold">{pkg.total_downloads}</span>
+                    </div>
+                    <span className="text-gray-500">descargas</span>
+                  </div>
+
+                  <div className="text-center">
+                    <div className="flex items-center gap-1 text-green-500">
+                      <BarChart3 className="h-4 w-4" />
+                      <span className="font-semibold">{pkg.popularity_score}</span>
+                    </div>
+                    <span className="text-gray-500">score</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-8">
+            <Package className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+            <p className="text-gray-600">No hay paquetes populares aún</p>
+          </div>
+        )}
+      </div>
+
+      {/* Platform Breakdown & Category Stats */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Platform Distribution */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-green-100 rounded-lg">
-                <Monitor className="h-5 w-5 text-green-600" />
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900">Android</h3>
-                <p className="text-sm text-gray-600">Stickers para Android</p>
-              </div>
+          <div className="flex items-center gap-3 mb-6">
+            <div className="p-2 bg-blue-100 rounded-lg">
+              <Activity className="h-6 w-6 text-blue-600" />
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900">Distribución por Plataforma</h3>
+              <p className="text-sm text-gray-600">Paquetes disponibles</p>
             </div>
           </div>
           
-          <div className="space-y-3">
-            <div className="flex justify-between items-center">
-              <span className="text-gray-600">Total Stickers</span>
-              <span className="font-semibold text-gray-900">{stats?.total_stickers_android || 0}</span>
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Smartphone className="h-4 w-4 text-blue-500" />
+                <span className="text-gray-700">Solo iOS</span>
+              </div>
+              <span className="font-semibold text-blue-600">{stats?.ios_packages || 0}</span>
+            </div>
+            
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Monitor className="h-4 w-4 text-green-500" />
+                <span className="text-gray-700">Solo Android</span>
+              </div>
+              <span className="font-semibold text-green-600">{stats?.android_packages || 0}</span>
+            </div>
+            
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Activity className="h-4 w-4 text-purple-500" />
+                <span className="text-gray-700">Multiplataforma</span>
+              </div>
+              <span className="font-semibold text-purple-600">{stats?.cross_platform_packages || 0}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Top Categories */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="p-2 bg-purple-100 rounded-lg">
+              <FolderOpen className="h-6 w-6 text-purple-600" />
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900">Top Categorías</h3>
+              <p className="text-sm text-gray-600">Por popularidad</p>
+            </div>
+          </div>
+          
+          {stats?.top_categories && stats.top_categories.length > 0 ? (
+            <div className="space-y-3">
+              {stats.top_categories.slice(0, 5).map((category, index) => (
+                <div key={category._id} className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                    <span className="text-gray-700">{category.category_name}</span>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-sm font-semibold text-gray-900">{category.package_count} paquetes</div>
+                    <div className="text-xs text-gray-500">{category.total_downloads} descargas</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-4">
+              <FolderOpen className="mx-auto h-8 w-8 text-gray-400 mb-2" />
+              <p className="text-gray-600 text-sm">No hay categorías disponibles</p>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Quick Actions */}
+      <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl border border-blue-200 p-6">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">🚀 Acciones Rápidas</h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <a
+            href="/packages"
+            className="flex items-center gap-3 p-4 bg-white rounded-lg hover:shadow-md transition-shadow"
+          >
+            <Package className="h-8 w-8 text-blue-600" />
+            <div>
+              <h4 className="font-semibold text-gray-900">Gestionar Paquetes</h4>
+              <p className="text-sm text-gray-600">Crear y editar paquetes</p>
+            </div>
+          </a>
+          
+          <a
+            href="/categories"
+            className="flex items-center gap-3 p-4 bg-white rounded-lg hover:shadow-md transition-shadow"
+          >
+            <FolderOpen className="h-8 w-8 text-purple-600" />
+            <div>
+              <h4 className="font-semibold text-gray-900">Categorías</h4>
+              <p className="text-sm text-gray-600">Organizar contenido</p>
+            </div>
+          </a>
+          
+          <a
+            href="/social-media"
+            className="flex items-center gap-3 p-4 bg-white rounded-lg hover:shadow-md transition-shadow"
+          >
+            <Users className="h-8 w-8 text-green-600" />
+            <div>
+              <h4 className="font-semibold text-gray-900">Redes Sociales</h4>
+              <p className="text-sm text-gray-600">Configurar enlaces</p>
+            </div>
+          </a>
+        </div>
+      </div>
             </div>
             <div className="w-full bg-gray-200 rounded-full h-2">
               <div 
