@@ -16,7 +16,8 @@ import {
   Heart,
   Banknote,
   Bell,
-  Cog
+  Cog,
+  User
 } from 'lucide-react';
 
 export default function Layout({ children }) {
