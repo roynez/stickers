@@ -11,7 +11,7 @@ from datetime import datetime
 from typing import Dict, Any, Optional
 
 # Configuration
-BACKEND_URL = "https://whatsapp-studio-1.preview.emergentagent.com/api"
+BACKEND_URL = "https://stickerpack-admin.preview.emergentagent.com/api"
 DEFAULT_ADMIN_EMAIL = "admin@stickers.com"
 DEFAULT_ADMIN_PASSWORD = "admin123"
 
