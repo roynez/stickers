@@ -18,18 +18,24 @@ import {
 
 export default function Dashboard() {
   const [stats, setStats] = useState(null);
+  const [popularPackages, setPopularPackages] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchStats();
+    fetchDashboardData();
   }, []);
 
-  const fetchStats = async () => {
+  const fetchDashboardData = async () => {
     try {
-      const response = await axios.get('/dashboard/stats');
-      setStats(response.data);
+      const [statsRes, popularRes] = await Promise.all([
+        axios.get('/dashboard/stats'),
+        axios.get('/dashboard/popular-packages?limit=5')
+      ]);
+      
+      setStats(statsRes.data);
+      setPopularPackages(popularRes.data);
     } catch (error) {
-      console.error('Error fetching stats:', error);
+      console.error('Error fetching dashboard data:', error);
     } finally {
       setLoading(false);
     }
