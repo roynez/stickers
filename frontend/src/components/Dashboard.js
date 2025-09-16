@@ -9,7 +9,7 @@ import {
   Heart,
   Download,
   Star,
-  Fire,
+  Flame,
   Sparkles,
   BarChart3,
   Users,
