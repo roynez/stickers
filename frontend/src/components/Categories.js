@@ -34,12 +34,17 @@ export default function Categories() {
     fetchCategories();
   }, []);
 
-  const fetchCategories = async () => {
+  const fetchData = async () => {
     try {
-      const response = await axios.get('/categories');
-      setCategories(response.data);
+      const [categoriesRes, configRes] = await Promise.all([
+        axios.get('/categories'),
+        axios.get('/upload-config')
+      ]);
+      
+      setCategories(categoriesRes.data);
+      setUploadConfig(configRes.data);
     } catch (error) {
-      toast.error('Error al cargar categorías');
+      toast.error('Error al cargar datos');
     } finally {
       setLoading(false);
     }
