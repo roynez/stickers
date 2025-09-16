@@ -1056,6 +1056,318 @@ async def test_firebase_config(admin = Depends(get_current_admin)):
     # In a real implementation, you would test actual Firebase connection here
     return {"status": "success", "message": "Firebase configuration appears valid"}
 
+# Create uploads directory
+UPLOAD_DIR = Path("uploads")
+UPLOAD_DIR.mkdir(exist_ok=True)
+
+# ==========================================
+# FILE UPLOAD ENDPOINTS
+# ==========================================
+
+@api_router.post("/upload/banner", response_model=FileUploadResponse)
+async def upload_banner_image(file: UploadFile = File(...), admin = Depends(get_current_admin)):
+    """Upload banner image (800x400px recommended)"""
+    
+    # Validate file type
+    if not any(file.filename.lower().endswith(ext) for ext in BANNER_IMAGE_FORMATS):
+        raise HTTPException(
+            status_code=400, 
+            detail=f"Invalid file format. Supported: {', '.join(BANNER_IMAGE_FORMATS)}"
+        )
+    
+    # Validate file size (2MB max)
+    file_content = await file.read()
+    file_size_mb = len(file_content) / (1024 * 1024)
+    
+    if file_size_mb > BANNER_CONFIG["max_file_size_mb"]:
+        raise HTTPException(
+            status_code=400,
+            detail=f"File too large. Max size: {BANNER_CONFIG['max_file_size_mb']}MB"
+        )
+    
+    # Generate unique filename
+    file_extension = Path(file.filename).suffix
+    unique_filename = f"banner_{uuid.uuid4()}{file_extension}"
+    file_path = UPLOAD_DIR / "banners" / unique_filename
+    
+    # Create banners directory
+    (UPLOAD_DIR / "banners").mkdir(exist_ok=True)
+    
+    # Save file
+    with open(file_path, "wb") as buffer:
+        buffer.write(file_content)
+    
+    # Generate URL (you'll need to adjust this based on your hosting)
+    file_url = f"/uploads/banners/{unique_filename}"
+    
+    return FileUploadResponse(
+        filename=unique_filename,
+        url=file_url,
+        size_kb=round(len(file_content) / 1024, 2),
+        message=f"Banner image uploaded successfully. Recommended size: {BANNER_CONFIG['recommended_size']}"
+    )
+
+@api_router.post("/upload/category-thumbnail", response_model=FileUploadResponse)
+async def upload_category_thumbnail(file: UploadFile = File(...), admin = Depends(get_current_admin)):
+    """Upload category thumbnail (200x200px recommended)"""
+    
+    # Validate file type
+    if not any(file.filename.lower().endswith(ext) for ext in CATEGORY_THUMBNAIL_FORMATS):
+        raise HTTPException(
+            status_code=400,
+            detail=f"Invalid file format. Supported: {', '.join(CATEGORY_THUMBNAIL_FORMATS)}"
+        )
+    
+    # Validate file size (500KB max)
+    file_content = await file.read()
+    file_size_mb = len(file_content) / (1024 * 1024)
+    
+    if file_size_mb > CATEGORY_THUMBNAIL_CONFIG["max_file_size_mb"]:
+        raise HTTPException(
+            status_code=400,
+            detail=f"File too large. Max size: {CATEGORY_THUMBNAIL_CONFIG['max_file_size_mb']}MB"
+        )
+    
+    # Generate unique filename
+    file_extension = Path(file.filename).suffix
+    unique_filename = f"category_{uuid.uuid4()}{file_extension}"
+    file_path = UPLOAD_DIR / "categories" / unique_filename
+    
+    # Create categories directory
+    (UPLOAD_DIR / "categories").mkdir(exist_ok=True)
+    
+    # Save file
+    with open(file_path, "wb") as buffer:
+        buffer.write(file_content)
+    
+    # Generate URL
+    file_url = f"/uploads/categories/{unique_filename}"
+    
+    return FileUploadResponse(
+        filename=unique_filename,
+        url=file_url,
+        size_kb=round(len(file_content) / 1024, 2),
+        message=f"Category thumbnail uploaded successfully. Recommended size: {CATEGORY_THUMBNAIL_CONFIG['recommended_size']}"
+    )
+
+# ==========================================
+# HORIZONTAL BANNERS MANAGEMENT
+# ==========================================
+
+@api_router.get("/banners", response_model=List[HorizontalBanner])
+async def get_banners(is_active: bool = None, admin = Depends(get_current_admin)):
+    """Get all horizontal banners"""
+    
+    query = {}
+    if is_active is not None:
+        query["is_active"] = is_active
+    
+    banners = await db.horizontal_banners.find(query).sort("priority", 1).to_list(50)
+    return [HorizontalBanner(**banner) for banner in banners]
+
+@api_router.post("/banners", response_model=HorizontalBanner)
+async def create_banner(banner_data: HorizontalBannerCreate, admin = Depends(get_current_admin)):
+    """Create new horizontal banner"""
+    
+    # Check max active banners limit
+    active_count = await db.horizontal_banners.count_documents({"is_active": True})
+    if banner_data.is_active and active_count >= MAX_BANNERS_ACTIVE:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Maximum {MAX_BANNERS_ACTIVE} active banners allowed"
+        )
+    
+    banner = HorizontalBanner(**banner_data.dict())
+    await db.horizontal_banners.insert_one(banner.dict())
+    
+    return banner
+
+@api_router.put("/banners/{banner_id}", response_model=HorizontalBanner)
+async def update_banner(banner_id: str, banner_data: HorizontalBannerUpdate, admin = Depends(get_current_admin)):
+    """Update horizontal banner"""
+    
+    current_banner = await db.horizontal_banners.find_one({"id": banner_id})
+    if not current_banner:
+        raise HTTPException(status_code=404, detail="Banner not found")
+    
+    # Build update data
+    update_data = {"updated_date": datetime.utcnow()}
+    
+    for field, value in banner_data.dict(exclude_unset=True).items():
+        update_data[field] = value
+    
+    # Check active banners limit if activating
+    if banner_data.is_active and not current_banner.get("is_active"):
+        active_count = await db.horizontal_banners.count_documents({"is_active": True})
+        if active_count >= MAX_BANNERS_ACTIVE:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Maximum {MAX_BANNERS_ACTIVE} active banners allowed"
+            )
+    
+    await db.horizontal_banners.update_one(
+        {"id": banner_id},
+        {"$set": update_data}
+    )
+    
+    updated_banner = await db.horizontal_banners.find_one({"id": banner_id})
+    return HorizontalBanner(**updated_banner)
+
+@api_router.post("/banners/{banner_id}/upload-image")
+async def upload_banner_image_to_banner(banner_id: str, file: UploadFile = File(...), admin = Depends(get_current_admin)):
+    """Upload image directly to a specific banner"""
+    
+    banner = await db.horizontal_banners.find_one({"id": banner_id})
+    if not banner:
+        raise HTTPException(status_code=404, detail="Banner not found")
+    
+    # Upload file using existing endpoint logic
+    upload_result = await upload_banner_image(file, admin)
+    
+    # Update banner with image info
+    await db.horizontal_banners.update_one(
+        {"id": banner_id},
+        {"$set": {
+            "image_filename": upload_result.filename,
+            "image_url": upload_result.url,
+            "image_size_kb": upload_result.size_kb,
+            "updated_date": datetime.utcnow()
+        }}
+    )
+    
+    return {
+        "message": "Banner image uploaded and linked successfully",
+        "upload_result": upload_result
+    }
+
+@api_router.delete("/banners/{banner_id}")
+async def delete_banner(banner_id: str, admin = Depends(get_current_admin)):
+    """Delete banner"""
+    
+    result = await db.horizontal_banners.delete_one({"id": banner_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Banner not found")
+    
+    return {"message": "Banner deleted successfully"}
+
+@api_router.get("/public/banners", response_model=BannerSliderResponse)
+async def get_public_banners():
+    """Get active banners for mobile apps (public endpoint)"""
+    
+    # Get active banners within date range
+    now = datetime.utcnow()
+    query = {
+        "is_active": True,
+        "$or": [
+            {"start_date": None},
+            {"start_date": {"$lte": now}}
+        ],
+        "$or": [
+            {"end_date": None}, 
+            {"end_date": {"$gte": now}}
+        ]
+    }
+    
+    banners = await db.horizontal_banners.find(query).sort("priority", 1).to_list(MAX_BANNERS_ACTIVE)
+    
+    config = SliderConfig(
+        auto_scroll=True,
+        scroll_interval_seconds=5,
+        show_indicators=True,
+        infinite_loop=True,
+        swipe_enabled=True
+    )
+    
+    return BannerSliderResponse(
+        banners=[HorizontalBanner(**banner) for banner in banners],
+        config=config,
+        total_count=len(banners)
+    )
+
+@api_router.post("/banners/{banner_id}/view")
+async def record_banner_view(banner_id: str):
+    """Record banner view (public endpoint)"""
+    
+    await db.horizontal_banners.update_one(
+        {"id": banner_id},
+        {"$inc": {"views_count": 1}}
+    )
+    
+    return {"message": "View recorded"}
+
+@api_router.post("/banners/{banner_id}/click")
+async def record_banner_click(banner_id: str):
+    """Record banner click (public endpoint)"""
+    
+    await db.horizontal_banners.update_one(
+        {"id": banner_id},
+        {"$inc": {"clicks_count": 1}}
+    )
+    
+    return {"message": "Click recorded"}
+
+# ==========================================
+# CATEGORIES WITH THUMBNAILS (UPDATED)
+# ==========================================
+
+@api_router.get("/categories", response_model=List[CategoryWithThumbnail])
+async def get_categories_with_thumbnails(admin = Depends(get_current_admin)):
+    """Get all categories with thumbnails"""
+    categories = await db.categories.find({"is_active": True}).sort("name", 1).to_list(100)
+    return [CategoryWithThumbnail(**category) for category in categories]
+
+@api_router.post("/categories", response_model=CategoryWithThumbnail)
+async def create_category_with_thumbnail(category_data: CategoryCreate, admin = Depends(get_current_admin)):
+    """Create new category (thumbnail uploaded separately)"""
+    
+    category = CategoryWithThumbnail(
+        name=category_data.name,
+        description=category_data.description or ""
+    )
+    
+    await db.categories.insert_one(category.dict())
+    return category
+
+@api_router.post("/categories/{category_id}/upload-thumbnail")
+async def upload_category_thumbnail_to_category(category_id: str, file: UploadFile = File(...), admin = Depends(get_current_admin)):
+    """Upload thumbnail directly to a specific category"""
+    
+    category = await db.categories.find_one({"id": category_id})
+    if not category:
+        raise HTTPException(status_code=404, detail="Category not found")
+    
+    # Upload file using existing endpoint logic
+    upload_result = await upload_category_thumbnail(file, admin)
+    
+    # Update category with thumbnail info
+    await db.categories.update_one(
+        {"id": category_id},
+        {"$set": {
+            "thumbnail_filename": upload_result.filename,
+            "thumbnail_url": upload_result.url,
+            "thumbnail_size_kb": upload_result.size_kb,
+            "updated_date": datetime.utcnow()
+        }}
+    )
+    
+    return {
+        "message": "Category thumbnail uploaded and linked successfully",
+        "upload_result": upload_result
+    }
+
+@api_router.get("/upload-config")
+async def get_upload_config(admin = Depends(get_current_admin)):
+    """Get upload configuration and requirements"""
+    
+    return {
+        "banners": BANNER_CONFIG,
+        "category_thumbnails": CATEGORY_THUMBNAIL_CONFIG,
+        "max_active_banners": MAX_BANNERS_ACTIVE
+    }
+
+# Serve uploaded files
+app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
+
 # Mount the API router
 app.include_router(api_router)
 
