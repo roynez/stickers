@@ -13,6 +13,7 @@ import Categories from './components/Categories';
 import PackageManager from './components/PackageManager';
 import AdminProfile from './components/AdminProfile';
 import SocialMediaSettings from './components/SocialMediaSettings';
+import HorizontalBanners from './components/HorizontalBanners';
 import Settings from './components/Settings';
 import Subscriptions from './components/Subscriptions';
 import SystemConfig from './components/SystemConfig';
