@@ -122,9 +122,13 @@ async def initialize_admin():
     await db.admins.insert_one(default_admin.dict())
     return {"message": "Default admin created successfully"}
 
+class LoginRequest(BaseModel):
+    email: str
+    password: str
+
 @api_router.post("/auth/login")
-async def login(email: str = None, password: str = None):
-    if not email or not password:
+async def login(login_data: LoginRequest):
+    if not login_data.email or not login_data.password:
         raise HTTPException(status_code=400, detail="Email and password required")
     
     admin = await db.admins.find_one({"email": email})
