@@ -131,8 +131,8 @@ async def login(login_data: LoginRequest):
     if not login_data.email or not login_data.password:
         raise HTTPException(status_code=400, detail="Email and password required")
     
-    admin = await db.admins.find_one({"email": email})
-    if not admin or not verify_password(password, admin["password"]):
+    admin = await db.admins.find_one({"email": login_data.email})
+    if not admin or not verify_password(login_data.password, admin["password"]):
         raise HTTPException(status_code=401, detail="Invalid credentials")
     
     if not admin.get("is_active", True):
