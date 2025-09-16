@@ -223,7 +223,7 @@ export default function PackageManager() {
   };
 
   const getPopularityIcon = (rank) => {
-    if (rank.includes('🔥')) return <Fire className="h-4 w-4 text-red-500" />;
+    if (rank.includes('🔥')) return <Flame className="h-4 w-4 text-red-500" />;
     if (rank.includes('⭐')) return <Star className="h-4 w-4 text-yellow-500" />;
     if (rank.includes('📈')) return <TrendingUp className="h-4 w-4 text-green-500" />;
     if (rank.includes('👍')) return <Sparkles className="h-4 w-4 text-blue-500" />;
