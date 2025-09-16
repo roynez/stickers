@@ -263,9 +263,9 @@ metadata:
 
 test_plan:
   current_focus:
-    - "AdminProfile component routing"
-    - "UnifiedStickers component integration"
-    - "System Configuration API"
+    - "Package-based System Implementation"
+    - "New Navigation System"
+    - "Dashboard Stats with Package Metrics"
   stuck_tasks:
     - "System Configuration API"
   test_all: false
