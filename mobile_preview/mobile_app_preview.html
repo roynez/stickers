@@ -502,7 +502,7 @@
         }
 
         .share-whatsapp {
-            background: #25d366;
+            background: linear-gradient(135deg, #25D366, #128C7E);
             color: white;
             border: none;
             padding: 16px 32px;
@@ -512,6 +512,13 @@
             cursor: pointer;
             width: 100%;
             margin-top: 16px;
+            box-shadow: 0 4px 16px rgba(37, 211, 102, 0.3);
+            transition: all 0.2s;
+        }
+
+        .share-whatsapp:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(37, 211, 102, 0.4);
         }
 
         /* Floating Action Button */
