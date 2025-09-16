@@ -22,6 +22,14 @@ from subscription_models import (
     PlanDuration, DEFAULT_PLANS, SUBSCRIPTION_FEATURES
 )
 
+# Import advanced models
+from advanced_models import (
+    AppFeatures, RatingConfig, PromoBanner, PromoBannerCreate, BannerAction, BannerActionType,
+    PushNotification, PushNotificationCreate, NotificationConfig, NotificationPriority,
+    UserAnalytics, SystemConfig, AdvancedStats, BannerAnalytics, AppConfigResponse,
+    RatingPromptCheck, DEFAULT_SYSTEM_CONFIG, SAMPLE_BANNERS, BannerPosition
+)
+
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
@@ -36,7 +44,7 @@ ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 1440  # 24 hours
 
 # Create the main app
-app = FastAPI(title="Unified Sticker Admin Panel with Subscriptions", version="2.0.0")
+app = FastAPI(title="Advanced Sticker Admin Panel", version="3.0.0")
 
 # Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
@@ -197,10 +205,14 @@ class DashboardStats(BaseModel):
     total_stickers_android: int
     total_stickers: int
     recent_uploads: int
-    # New subscription stats
+    # Subscription stats
     total_subscribers: int
     monthly_revenue: float
     active_subscriptions: int
+    # Advanced stats
+    total_banners: int
+    active_banners: int
+    total_notifications_sent: int
 
 # Helper Functions (keeping existing)
 def hash_password(password: str) -> str:
@@ -284,6 +296,14 @@ async def get_dashboard_stats(admin = Depends(get_current_admin)):
     
     monthly_revenue = (active_monthly_subs * 50.0) + (active_yearly_subs * 400.0 / 12)
     
+    # Advanced stats
+    total_banners = await db.promo_banners.count_documents({})
+    active_banners = await db.promo_banners.count_documents({"is_active": True})
+    total_notifications_sent = await db.push_notifications.aggregate([
+        {"$group": {"_id": None, "total": {"$sum": "$sent_count"}}}
+    ]).to_list(1)
+    total_notifications_sent = total_notifications_sent[0]["total"] if total_notifications_sent else 0
+    
     return DashboardStats(
         total_categories=total_categories,
         total_subcategories=total_subcategories,
@@ -293,10 +313,254 @@ async def get_dashboard_stats(admin = Depends(get_current_admin)):
         recent_uploads=recent_uploads,
         total_subscribers=total_subscribers,
         monthly_revenue=round(monthly_revenue, 2),
-        active_subscriptions=total_subscribers
+        active_subscriptions=total_subscribers,
+        total_banners=total_banners,
+        active_banners=active_banners,
+        total_notifications_sent=total_notifications_sent
     )
 
-# SUBSCRIPTION ROUTES
+# SYSTEM CONFIGURATION ROUTES
+@api_router.get("/system/config", response_model=SystemConfig)
+async def get_system_config(admin = Depends(get_current_admin)):
+    config = await db.system_config.find_one()
+    if not config:
+        # Create default config
+        default_config = SystemConfig(**DEFAULT_SYSTEM_CONFIG)
+        await db.system_config.insert_one(default_config.dict())
+        return default_config
+    return SystemConfig(**config)
+
+@api_router.put("/system/config", response_model=SystemConfig)
+async def update_system_config(config_data: SystemConfig, admin = Depends(get_current_admin)):
+    config_data.updated_date = datetime.utcnow()
+    
+    await db.system_config.update_one(
+        {},
+        {"$set": config_data.dict()},
+        upsert=True
+    )
+    
+    return config_data
+
+# BANNER MANAGEMENT ROUTES
+@api_router.get("/banners", response_model=List[PromoBanner])
+async def get_banners(admin = Depends(get_current_admin)):
+    banners = await db.promo_banners.find({}).sort("priority", -1).to_list(100)
+    return [PromoBanner(**banner) for banner in banners]
+
+@api_router.post("/banners", response_model=PromoBanner)
+async def create_banner(banner_data: PromoBannerCreate, admin = Depends(get_current_admin)):
+    banner = PromoBanner(**banner_data.dict())
+    await db.promo_banners.insert_one(banner.dict())
+    return banner
+
+@api_router.put("/banners/{banner_id}", response_model=PromoBanner)
+async def update_banner(banner_id: str, banner_data: PromoBannerCreate, admin = Depends(get_current_admin)):
+    update_data = banner_data.dict()
+    update_data["updated_date"] = datetime.utcnow()
+    
+    result = await db.promo_banners.update_one(
+        {"id": banner_id},
+        {"$set": update_data}
+    )
+    
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Banner not found")
+    
+    updated_banner = await db.promo_banners.find_one({"id": banner_id})
+    return PromoBanner(**updated_banner)
+
+@api_router.delete("/banners/{banner_id}")
+async def delete_banner(banner_id: str, admin = Depends(get_current_admin)):
+    result = await db.promo_banners.delete_one({"id": banner_id})
+    
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Banner not found")
+    
+    return {"message": "Banner deleted successfully"}
+
+# PUSH NOTIFICATIONS ROUTES
+@api_router.get("/notifications", response_model=List[PushNotification])
+async def get_notifications(admin = Depends(get_current_admin)):
+    notifications = await db.push_notifications.find({}).sort("created_date", -1).to_list(100)
+    return [PushNotification(**notif) for notif in notifications]
+
+@api_router.post("/notifications", response_model=PushNotification)
+async def create_notification(notification_data: PushNotificationCreate, admin = Depends(get_current_admin)):
+    notification = PushNotification(**notification_data.dict())
+    if notification.is_scheduled and notification.scheduled_for:
+        notification.status = "scheduled"
+    else:
+        notification.status = "draft"
+    
+    await db.push_notifications.insert_one(notification.dict())
+    return notification
+
+@api_router.post("/notifications/{notification_id}/send")
+async def send_notification(notification_id: str, admin = Depends(get_current_admin)):
+    # This would integrate with Firebase/APNS in production
+    # For now, just mark as sent
+    
+    result = await db.push_notifications.update_one(
+        {"id": notification_id},
+        {
+            "$set": {
+                "status": "sent",
+                "sent_date": datetime.utcnow(),
+                "sent_count": 1,  # This would be actual count
+                "success_count": 1
+            }
+        }
+    )
+    
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Notification not found")
+    
+    return {"message": "Notification sent successfully"}
+
+# PUBLIC API FOR MOBILE APPS
+@api_router.get("/app/config", response_model=AppConfigResponse)
+async def get_app_config(platform: str = "ios"):
+    # Get system config
+    config = await db.system_config.find_one()
+    if not config:
+        config = DEFAULT_SYSTEM_CONFIG
+    
+    # Get active banners
+    now = datetime.utcnow()
+    banner_query = {
+        "is_active": True,
+        "platforms": platform,
+        "$or": [
+            {"start_date": None, "end_date": None},
+            {"start_date": {"$lte": now}, "end_date": None},
+            {"start_date": None, "end_date": {"$gte": now}},
+            {"start_date": {"$lte": now}, "end_date": {"$gte": now}}
+        ]
+    }
+    
+    banners = await db.promo_banners.find(banner_query).sort("priority", -1).to_list(10)
+    
+    # Get subscription plans only if enabled
+    subscription_plans = []
+    if config.get("features", {}).get("subscriptions_enabled", False):
+        plans = await db.subscription_plans.find({"is_active": True}).to_list(10)
+        subscription_plans = plans
+    
+    return AppConfigResponse(
+        features=AppFeatures(**config.get("features", {})),
+        rating_config=RatingConfig(**config.get("rating_config", {})),
+        active_banners=[PromoBanner(**banner) for banner in banners],
+        subscription_plans=subscription_plans
+    )
+
+@api_router.get("/app/rating-check/{user_id}", response_model=RatingPromptCheck)
+async def check_rating_prompt(user_id: str):
+    # Get system config
+    config = await db.system_config.find_one()
+    if not config or not config.get("rating_config", {}).get("enabled", True):
+        return RatingPromptCheck(should_show=False, message="")
+    
+    rating_config = RatingConfig(**config.get("rating_config", {}))
+    
+    # Get or create user analytics
+    user_analytics = await db.user_analytics.find_one({"user_id": user_id})
+    if not user_analytics:
+        user_analytics = {
+            "user_id": user_id,
+            "app_opens": 1,
+            "stickers_downloaded": 0,
+            "days_since_install": 0,
+            "has_rated": False,
+            "created_date": datetime.utcnow()
+        }
+        await db.user_analytics.insert_one(user_analytics)
+        return RatingPromptCheck(should_show=False, message="")
+    
+    # Check if user has already rated
+    if user_analytics.get("has_rated", False):
+        return RatingPromptCheck(should_show=False, message="")
+    
+    # Check if enough time has passed since last prompt
+    last_prompt = user_analytics.get("last_rating_prompt")
+    if last_prompt:
+        days_since_prompt = (datetime.utcnow() - last_prompt).days
+        if days_since_prompt < rating_config.show_frequency_days:
+            return RatingPromptCheck(should_show=False, message="")
+    
+    # Check criteria
+    should_show = (
+        user_analytics.get("app_opens", 0) >= rating_config.min_app_opens and
+        user_analytics.get("stickers_downloaded", 0) >= rating_config.min_stickers_downloaded and
+        user_analytics.get("days_since_install", 0) >= rating_config.days_since_install
+    )
+    
+    if should_show:
+        # Update last prompt time
+        await db.user_analytics.update_one(
+            {"user_id": user_id},
+            {"$set": {"last_rating_prompt": datetime.utcnow()}}
+        )
+        
+        redirect_url = None
+        if rating_config.redirect_to_store:
+            # These would be the actual app store URLs
+            redirect_url = "https://apps.apple.com/app/your-app-id"  # iOS
+            # or "https://play.google.com/store/apps/details?id=your.package.name"  # Android
+        
+        return RatingPromptCheck(
+            should_show=True,
+            message=rating_config.custom_message,
+            redirect_url=redirect_url
+        )
+    
+    return RatingPromptCheck(should_show=False, message="")
+
+@api_router.post("/app/analytics/{user_id}")
+async def update_user_analytics(
+    user_id: str,
+    app_opens: Optional[int] = None,
+    stickers_downloaded: Optional[int] = None,
+    has_rated: Optional[bool] = None
+):
+    update_data = {"updated_date": datetime.utcnow()}
+    
+    if app_opens is not None:
+        update_data["app_opens"] = app_opens
+    if stickers_downloaded is not None:
+        update_data["stickers_downloaded"] = stickers_downloaded
+    if has_rated is not None:
+        update_data["has_rated"] = has_rated
+    
+    # Calculate days since install
+    user_analytics = await db.user_analytics.find_one({"user_id": user_id})
+    if user_analytics:
+        days_since_install = (datetime.utcnow() - user_analytics["created_date"]).days
+        update_data["days_since_install"] = days_since_install
+    
+    await db.user_analytics.update_one(
+        {"user_id": user_id},
+        {"$set": update_data, "$inc": {"app_opens": 1 if app_opens is None else 0}},
+        upsert=True
+    )
+    
+    return {"message": "Analytics updated"}
+
+# Initialize sample banners
+@api_router.post("/banners/init-samples")
+async def initialize_sample_banners(admin = Depends(get_current_admin)):
+    existing_banners = await db.promo_banners.count_documents({})
+    if existing_banners > 0:
+        return {"message": "Banners already exist"}
+    
+    for banner_data in SAMPLE_BANNERS:
+        banner_data["created_date"] = datetime.utcnow()
+        banner_data["updated_date"] = datetime.utcnow()
+        await db.promo_banners.insert_one(banner_data)
+    
+    return {"message": "Sample banners created", "count": len(SAMPLE_BANNERS)}
+
+# SUBSCRIPTION ROUTES (existing, but now controlled by feature flag)
 @api_router.get("/subscriptions/plans", response_model=List[SubscriptionPlan])
 async def get_subscription_plans(admin = Depends(get_current_admin)):
     plans = await db.subscription_plans.find({"is_active": True}).sort("price_mxn", 1).to_list(100)
@@ -459,7 +723,7 @@ async def initialize_subscription_plans(admin = Depends(get_current_admin)):
     
     return {"message": "Default subscription plans created", "count": len(DEFAULT_PLANS)}
 
-# Categories (updated with premium support)
+# EXISTING ROUTES (Categories, Subcategories, Stickers, Settings - keeping all existing functionality)
 @api_router.get("/categories", response_model=List[Category])
 async def get_categories(platform: Optional[Platform] = None, admin = Depends(get_current_admin)):
     query = {"is_active": True}
