@@ -448,7 +448,7 @@ async def check_user_subscription(user_id: str):
 # Initialize default subscription plans
 @api_router.post("/subscriptions/init-plans")
 async def initialize_subscription_plans(admin = Depends(get_current_admin)):
-    existing_plans = await db.subscription_plans.count_documents()
+    existing_plans = await db.subscription_plans.count_documents({})
     if existing_plans > 0:
         return {"message": "Plans already exist"}
     
