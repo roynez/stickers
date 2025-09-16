@@ -250,8 +250,9 @@ test_plan:
   current_focus:
     - "AdminProfile component routing"
     - "UnifiedStickers component integration"
-    - "Firebase Configuration API"
-  stuck_tasks: []
+    - "System Configuration API"
+  stuck_tasks:
+    - "System Configuration API"
   test_all: false
   test_priority: "high_first"
 
