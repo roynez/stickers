@@ -333,56 +333,6 @@ export default function Dashboard() {
           </a>
         </div>
       </div>
-            </div>
-            <div className="w-full bg-gray-200 rounded-full h-2">
-              <div 
-                className="bg-green-600 h-2 rounded-full transition-all duration-300"
-                style={{ 
-                  width: stats?.total_stickers > 0 
-                    ? `${((stats?.total_stickers_android || 0) / stats.total_stickers) * 100}%` 
-                    : '0%' 
-                }}
-              ></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Quick Actions */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Acciones Rápidas</h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <button className="flex items-center gap-3 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-left">
-            <div className="p-2 bg-blue-100 rounded-lg">
-              <FolderOpen className="h-5 w-5 text-blue-600" />
-            </div>
-            <div>
-              <p className="font-medium text-gray-900">Nueva Categoría</p>
-              <p className="text-sm text-gray-600">Crear categoría para ambas plataformas</p>
-            </div>
-          </button>
-          
-          <button className="flex items-center gap-3 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-left">
-            <div className="p-2 bg-green-100 rounded-lg">
-              <Upload className="h-5 w-5 text-green-600" />
-            </div>
-            <div>
-              <p className="font-medium text-gray-900">Subir Stickers</p>
-              <p className="text-sm text-gray-600">Añadir nuevos stickers al catálogo</p>
-            </div>
-          </button>
-          
-          <button className="flex items-center gap-3 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-left">
-            <div className="p-2 bg-purple-100 rounded-lg">
-              <TrendingUp className="h-5 w-5 text-purple-600" />
-            </div>
-            <div>
-              <p className="font-medium text-gray-900">Ver Configuración</p>
-              <p className="text-sm text-gray-600">Configurar anuncios por plataforma</p>
-            </div>
-          </button>
-        </div>
-      </div>
     </div>
   );
 }
