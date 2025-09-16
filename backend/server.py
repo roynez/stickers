@@ -285,27 +285,7 @@ async def get_popular_packages(limit: int = 10, admin = Depends(get_current_admi
 # CATEGORIES MANAGEMENT (Simplified - No Subcategories)
 # ==========================================
 
-@api_router.get("/categories")
-async def get_categories(admin = Depends(get_current_admin)):
-    """Get all categories (no subcategories)"""
-    categories = await db.categories.find({"is_active": True}).sort("name", 1).to_list(100)
-    return categories
-
-@api_router.post("/categories")
-async def create_category(name: str, description: str = "", admin = Depends(get_current_admin)):
-    """Create new category"""
-    category = {
-        "id": str(uuid.uuid4()),
-        "name": name,
-        "description": description,
-        "is_active": True,
-        "package_count": 0,
-        "created_date": datetime.utcnow(),
-        "updated_date": datetime.utcnow()
-    }
-    
-    await db.categories.insert_one(category)
-    return category
+# Categories endpoints moved to the bottom with thumbnail support
 
 @api_router.put("/categories/{category_id}")
 async def update_category(category_id: str, name: str, description: str = "", admin = Depends(get_current_admin)):
