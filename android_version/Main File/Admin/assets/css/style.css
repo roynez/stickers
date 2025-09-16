@@ -1,0 +1,259 @@
+/*--------------------------
+[ Coomon CSS ]
+--------------------------*/
+hr{
+	margin-top: 0px !important;
+	margin-bottom: 0px !important;
+}
+
+img {
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+img:hover {opacity: 0.7;}
+
+/*--------------------------
+[ Page Container Fluid ]
+--------------------------*/
+.container-fluid{
+	position: relative;
+}
+.container-fluid .card {
+	margin-bottom: 0;
+}
+.logout-btn{
+    color:#fff !important;
+	background: #9972db !important;
+	transition: all 0.3s ease-in-out;
+}
+.logout-btn:hover{
+	border-radius: 10px !important;
+	transition: all 0.3s ease-in-out;
+}
+
+/*--------------------------
+[ Sidebar Nav ]
+--------------------------*/
+.sidebar .nav i {
+    font-size: 25px;
+}
+.sidebar .nav > li.active-pro{
+    position: absolute;
+    width: 100%;
+    bottom: 10px;
+}
+.sidebar .nav > li.active-pro a{
+    background: rgba(255, 255, 255, 0.14);
+    opacity: 1;
+    color: #FFFFFF;
+}
+
+/*--------------------------
+[ Dashboard List ]
+--------------------------*/
+.dash-col{
+	padding-top: 15px;
+	padding-bottom: 15px;
+	cursor: pointer;
+}
+.container-fluid .card:hover{
+    margin-bottom: 0;
+    box-shadow: 0px 0px 10px #9c9c9ca6;
+	transition: all 0.3s ease-in-out;
+}
+
+/*--------------------------
+[ Table List ]
+--------------------------*/
+.table-upgrade td:nth-child(2),
+.table-upgrade td:nth-child(3){
+    text-align: center;
+}
+.table > tbody > tr > td {
+    border-top: none;
+}
+.fa-edit{
+	font-weight: bold !important;
+	font-size: 20px;
+	cursor: pointer;
+}
+.fa-remove{
+	font-weight: bold !important;
+	font-size: 20px;
+	padding-left: 10px;
+	cursor: pointer;
+}
+.category-image{ 
+	width: 50px;
+}
+
+/*--------------------------
+[ Form ]
+--------------------------*/
+.form-title{
+	text-align: center;
+}
+
+.btn-center{
+	text-align: center;
+}
+
+/*--------------------------
+[ Sticker Div ]
+--------------------------*/
+.sticker-div-top{
+	padding-top: 10px;
+    padding-bottom: 10px;
+}
+.sticker-div{
+	text-align: center;
+	border: 2px solid cadetblue;
+    border-radius: 15px;
+    padding: 10px;
+}
+.sticker-image{
+	width: 80px;
+}
+.sticker-p{
+	padding-top: 15px;
+}
+
+.sticker-i-delete{
+	padding-left: 0px !important; 
+}
+.sticker-h4{
+	text-align: center;
+}
+
+/*--------------------------
+[ Page/Table/Form Loader ]
+--------------------------*/
+.loader-div{
+	display:none; 
+	background: #fff;
+	position: absolute;
+	height: 100%;
+	width: 100%;
+	z-index: 111;
+}
+.loader-div .login-loader-image{
+	position: absolute;
+	width: 6%;
+	margin-left: 47%;
+	margin-top: 20%;
+}
+.loader-image{
+	position: absolute; 
+	width: 15%;
+	margin-left: 43%;
+	margin-top: 15%;
+}
+.list-loader-div{
+	display:none;
+	background: #fff;
+	z-index: 111; 
+	position: absolute; 
+	height: 100%;
+	width: 100%;
+}
+.list-loader-image{
+	position: absolute; 
+	width: 6%;
+	margin-left: 47%;
+	margin-top: 15%;
+}
+
+/*--------------------------
+[ Modal ]
+--------------------------*/
+/* The Modal (background) */
+.modal {
+    position: fixed;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100vh;
+	background-color: rgba(0,0,0,0.9);
+	transition: all 0.9s ease-in-out;
+}
+.modal-body .content{
+    padding: 20px 0;
+}
+.modal-content {
+    margin: auto;
+    display: block;
+    width: 100%;
+    max-width: 900px;
+}
+
+/* Modal Content (Image) */
+.modal img{
+	padding: 50px;
+	margin-top: 6%;
+	width: 35%;
+}
+
+@keyframes zoom {
+    from {transform:scale(0)}
+    to {transform:scale(1)}
+}
+
+/* The Close Button */
+.close {
+    position: absolute;
+    top: 15px;
+    right: 35px;
+    color: #f1f1f1;
+    font-size: 40px;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+.close:hover,
+.close:focus {
+    color: #bbb;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/*-----------------------------
+[ Smaller Responsive Device ]
+------------------------------*/
+
+@media only screen and (max-width: 600px) {
+    
+	.loader-div{
+		width: 89%;
+	}
+	.loader-image{
+		width: 50%; 
+		margin-left: 25%;
+		margin-top: 30%;
+	}
+}
+
+@media all and (max-width: 991px)  {
+    .sidebar .nav > li.active-pro{
+        position: initial;
+    }
+}
+
+@media (min-width: 992px){
+    .typo-line{
+        padding-left: 140px;
+        margin-bottom: 40px;
+        position: relative;
+    }
+    .typo-line .category{
+        transform: translateY(-50%);
+        top: 50%;
+        left: 0px;
+        position: absolute;
+    }
+	.alert-validate::before {
+		visibility: visible;
+		opacity: 1;
+	}
+}

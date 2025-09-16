@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">WPSticker</string>
+
+    //Other Text
+    <string name="btnDownload">Download</string>
+    <string name="btnAddToWhatsapp">Add to Whatsapp</string>
+    <string name="textStickerCount">0 Stickers</string>
+    <string name="textStickerName">Couple Goals</string>
+    <string name="title_activity__subcategory">Activity_Subcategory</string>
+    <string name="title_activity__sticker_list">Activity_StickerList</string>
+
+
+    //ADMOB SETUP DETAILS
+    <string name="APP_ID">ca-app-pub-3940256099942544~3347511713</string>
+    <string name="ADMOB_INTERSTITIAL">ca-app-pub-3940256099942544/1033173712</string>
+
+</resources>

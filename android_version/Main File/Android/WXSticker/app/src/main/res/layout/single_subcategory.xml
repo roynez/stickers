@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="wrap_content"
+    android:gravity="center"
+    android:layout_marginLeft="5sp"
+    android:layout_marginRight="5sp"
+    android:layout_height="wrap_content">
+
+    <ImageView
+        android:id="@+id/img_subcategoryImage"
+        android:layout_width="80sp"
+        android:layout_height="80sp" />
+
+    <TextView
+        android:id="@+id/tv_subcategoryName"
+        android:textColor="#000"
+        android:text="PUBG"
+        android:textStyle="bold"
+        android:fadingEdge="horizontal"
+        android:scrollHorizontally="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+</LinearLayout>

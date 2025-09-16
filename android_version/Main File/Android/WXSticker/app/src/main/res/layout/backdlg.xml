@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:n1="http://schemas.android.com/apk/res/android"
+    n1:layout_width="fill_parent"
+    n1:layout_height="fill_parent"
+    n1:layout_gravity="center"
+    n1:gravity="center">
+
+    <androidx.cardview.widget.CardView
+        xmlns:n2="http://schemas.android.com/apk/res-auto"
+        n1:layout_width="fill_parent"
+        n1:layout_height="wrap_content"
+        n1:background="@drawable/img_border4"
+        n2:cardCornerRadius="5dp"
+        n2:cardElevation="10.0dip"
+        n2:cardMaxElevation="5dp"
+        n2:cardUseCompatPadding="true">
+
+        <LinearLayout
+            n1:layout_width="fill_parent"
+            n1:layout_height="wrap_content"
+            n1:layout_gravity="center"
+            n1:layout_margin="10dp"
+            n1:background="@drawable/img_border4"
+            n1:gravity="center"
+            n1:orientation="vertical">
+
+            <LinearLayout
+                n1:layout_width="fill_parent"
+                n1:layout_height="wrap_content"
+                n1:layout_weight="1.0"
+                n1:orientation="vertical">
+
+                <ImageView
+                    n1:layout_width="100dp"
+                    n1:layout_height="100dp"
+                    n1:layout_gravity="center"
+                    n1:layout_weight="1.0"
+                    n1:src="@mipmap/ic_launcher" />
+            </LinearLayout>
+
+            <LinearLayout
+                n1:layout_width="fill_parent"
+                n1:layout_height="wrap_content"
+                n1:layout_gravity="center_horizontal"
+                n1:layout_marginBottom="5dp"
+                n1:layout_marginTop="5dp"
+                n1:gravity="center_horizontal"
+                n1:orientation="horizontal"
+                n1:weightSum="1.0">
+
+                <LinearLayout
+                    n1:layout_width="fill_parent"
+                    n1:layout_height="wrap_content"
+                    n1:layout_weight="1.0"
+                    n1:orientation="vertical">
+
+                    <TextView
+                        n1:layout_width="wrap_content"
+                        n1:layout_height="wrap_content"
+                        n1:layout_gravity="center_horizontal"
+                        n1:text="App Ratting...."
+                        n1:textColor="@color/colorPrimary" />
+
+                    <com.hsalf.smilerating.SmileRating
+                        n1:id="@+id/smile_rating"
+                        n1:layout_width="wrap_content"
+                        n1:layout_height="wrap_content" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <TextView
+                n1:layout_width="wrap_content"
+                n1:layout_height="wrap_content"
+                n1:layout_marginBottom="5dp"
+                n1:layout_marginTop="5dp"
+                n1:text="Are you sure to exit ?"
+                n1:textColor="@android:color/black"
+                n1:textSize="20.0sp" />
+
+            <LinearLayout
+                n1:layout_width="fill_parent"
+                n1:layout_height="wrap_content"
+                n1:orientation="horizontal">
+
+                <Button
+                    n1:id="@+id/btn_yes"
+                    n1:layout_width="wrap_content"
+                    n1:layout_height="wrap_content"
+                    n1:layout_marginRight="10dp"
+                    n1:layout_weight="1.0"
+                    n1:background="@drawable/img_border3"
+                    n1:text="yes"
+                    n1:textColor="@android:color/white" />
+
+                <Button
+                    n1:id="@+id/btn_no"
+                    n1:layout_width="wrap_content"
+                    n1:layout_height="wrap_content"
+                    n1:layout_weight="1.0"
+                    n1:background="@drawable/img_border1"
+                    n1:text="No"
+                    n1:textColor="@android:color/white" />
+            </LinearLayout>
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+</LinearLayout>

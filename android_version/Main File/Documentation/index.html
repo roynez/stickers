@@ -1,0 +1,709 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<title>Documentation</title>
+    
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta charset="utf-8">
+		
+	<!-- Minified Bootstrap CSS -->
+	<link rel="stylesheet" type="text/css" href="css/bootstrap.min.css" />	
+	<!-- Minified Font Awesome CSS -->
+	<link rel="stylesheet" href="css/font-awesome.min.css">
+	<!-- Custom CSS -->
+	<link rel="stylesheet" type="text/css" href="css/style.css" />
+
+</head>
+<body>
+
+	<!-- Side navigation -->
+	<div class="sidenav">
+		<a id="00" href="#introduction">Introduction</a>
+		<hr>
+		<a id="01" href="#components">Components</a>
+		<hr>
+		<a id="02" href="#admin-requirements" >Admin Setup</a>
+		<div class="sub-menu">
+			<a id="03" href="#admin-requirements">Requirements</a>
+			<hr>
+			<a id="04" href="#admin-configuration">Configuration</a>
+			<hr>
+		</div>
+
+		<a id="03" href="#api-configuration" >Web API Setup</a>
+
+		<a id="04" href="#requirements" >Android App Setup</a>
+		<div class="sub-menu">
+			<a id="003" href="#requirements">Requirements</a>
+			<hr>
+			<a id="004" href="#configuration">Configuration</a>
+			<hr>
+		</div>
+
+		<a id="05" href="#sources">Sources</a>
+		<hr>
+		<a id="06" href="#support">Support Desk</a>
+		<hr>
+		<a id="07" href="#versionhistory">Version History</a>
+		<hr>
+	</div>
+
+	<!-- Page content -->
+	<div class="container">
+		<div class="row">
+			<div class="col-lg-12 col-md-12 col-sm-12 col-12">	
+			  	<div class="heading">
+			  		<img class="icon" src="images/icon.png" alt="">
+			  		<h2>Sticker Store</h2>
+			  		<br>
+					<p>Firstly, big thanks for purchasing the <b>Sticker Store</b> application, your support is truly appreciated! If you have any questions that are beyond the scope of this documentation, please feel free to email via<a class="atv" href="http://loopinfosol.com/support/" target="_blank">Our Support Forum</a></p>
+				</div>
+			</div>
+		</div>
+		<br>
+		<div class="row" id="introduction">
+			<div class="col-lg-12 col-md-12 col-sm-12 col-12">
+				<div class="introduction">
+					<hr>
+					<h3>Introduction</h3>
+					<hr>
+					<div class="about-div">
+						<p><b>Item Name:</b> Sticker Store</p>
+						<p><b>Item Type:</b> Admin Panel + Android Application</p>
+						<p><b>Author:</b> CrossMoon</p>
+						<p><b>Support Site:</b> <a class="atv" href="http://loopinfosol.com/support/" target="_blank">loopinfosol.com</a></p>
+					</div>
+					<br>
+					<p> This documentation will give you an understanding of how Sticker Store application is structured and, will help you regarding each step of customization. Please go through the documentation carefully to understand how this template is made and how to edit this properly.</p>
+					
+					<p>If you require further assistance, related to topics not covered in this documentation, then please contact us via<a class="atv" href="http://loopinfosol.com/support/" target="_blank">Our Support Forum</a></p>
+
+					<p>If you want to customize this product as per your requirement, please contact us here:<a class="atv" href="http://loopinfosol.com/support/" target="_blank">Support Forum</a></p>
+				</div>
+			</div>
+		</div>
+		<br>
+		<div class="row" id="components">
+			<div class="col-lg-12 col-md-12 col-sm-12 col-12">	
+				<div class="components">
+					<hr>
+					<h3>Components</h3>
+					<hr>					
+					<ol>
+				        <li>Open the <span class="atv">... /Main File</span> Folder to find all the Source Files</li>
+				        <li>WebView Plus contains:
+					        <ul>
+					        	<li>
+					         		<i class="fa fa-folder-open-o"></i><span class="atv">Admin</span> - Backend Panel Source Code Folder
+					            </li>
+					            <li>
+					         		<i class="fa fa-folder-open-o"></i><span class="atv">Services</span> - Web API Source Code Folder
+					            </li>
+					         	<li>
+					         		<i class="fa fa-folder-open-o"></i><span class="atv">Android</span> - Android App Source Code Folder
+					            </li>
+                                <li>
+                                    <i class="fa fa-folder-open-o"></i><span class="atv">Database</span> - Application Database
+                                </li>
+					            <li>
+					            	<i class="fa fa-folder-open-o"></i><span class="atv">Documentation</span> - Documentation Folder
+					            </li>
+					        </ul>
+				        </li>
+				    </ol>								
+				</div>
+			</div>	
+		</div>
+		<br>
+
+		<div class="row" id="admin-requirements">
+			<div class="col-lg-12 col-md-12 col-sm-12 col-12">	
+				<div class="requirements">
+					<hr>
+					<h3>Requirements</h3>
+					<hr>					
+					<ul style="list-style-type:circle;">
+				        <li>PHP 5.4+ :<a class="atv" href="https://www.php.net/downloads.php" target="_blank"><u>Download</u></a></li>
+				        <li>MySqli:<a class="atv" href="https://www.mysql.com/downloads/" target="_blank"><u>Download</u></a></li>
+				    </ul>								
+				</div>
+			</div>	
+		</div>
+		<br>
+		<div class="row" id="admin-configuration">
+			<div class="col-lg-12 col-md-12 col-sm-12 col-12">	
+				<div class="configuration">
+					<hr>
+					<h3>Configuration</h3>
+					<hr>
+					<div class="section">
+						<p>➣ There are the Six thing to setup & run the plugin.</p>
+
+						<h6>1. Hosting Account <a class="click-a" href="#SI-hosting">Click</a></h6>
+						<h6>2. How to Setup Database <a class="click-a" href="#SI-db-setup">Click</a></h6>
+						<h6>3. How to Setup Admin Panel <a class="click-a" href="#SI-php-setup">Click</a></h6>
+						<h6>4. Configure Database Connection <a class="click-a" href="#SI-db-conn">Click</a></h6>
+						<h6>6. Run the plugin into browser <a class="click-a" href="#SI-run">Click</a></h6>
+				    </div>
+					<div class="section" id="SI-hosting">					
+						
+						<h4>A). Step-1 : Hosting Account</h4>
+						
+						<div class="main-section-1">
+							<p>➣ You must have <span class="f-red"><b>Hosting</b></span> account. And if you don't have please purchase it before move ahed. <a class="click-a" href="https://www.hostinger.in/web-hosting" target="_blank">Click</a></p>
+
+							<p class="notes">Note: I am just giving the example of Hostinger account. You can purchase any of hostinge account that support PHP.</p>
+
+							<p>➣ Get Login into your hostinger account and open dashboard.</p>
+
+							<img onclick="zoomImage('images/si-hosting-01.png')"  src="images/si-hosting-01.png" alt=""/>
+							<br><br>
+							<p class="notes">Now Hosting account end up here and move to the next step below..</p>
+						</div>	
+
+					</div>
+
+					<div class="section" id="SI-db-setup">
+
+						<h4>B). Step-2 : How to Setup Database</h4>
+						
+						<div class="main-section-1">
+								
+							<p>➣ From Dashboard Click on  <span class="f-red"><b>MySQL Database</b></span></p>
+							<img onclick="zoomImage('images/si-db-setup-1.png')"  src="images/si-db-setup-1.png" alt=""/>
+							<br>
+							<p>➣ Enter the <span class="f-red"><b>MySQL database name</b></span> & <span class="f-red"><b>MySQL username</b></span> & <span class="f-red"><b>Password</b></span></p>
+							<p>➣ After entering the required detail Click on <span class="f-red"><b>Create</b></span> button.</p>
+							<img onclick="zoomImage('images/si-db-setup-2.png')"  src="images/si-db-setup-2.png" alt=""/>
+
+							<br>
+							<p>➣ Select your new created Database & Click on <span class="f-red"><b>phpMyAdmin</b></span></p>
+						    <img onclick="zoomImage('images/si-db-setup-3.png')" src="images/si-db-setup-3.png"></img>
+							
+							<br>
+							<p>➣ Select your new created Database & Click on<span class="f-red"><b>Import</b></span> Sql database file.</p>
+						    <img onclick="zoomImage('images/si-db-setup-4.png')" src="images/si-db-setup-4.png"></img>
+
+							<br>
+						    <p>➣ Click on <span class="f-red"><b>Browse</b></span> button.</p>
+						    <img onclick="zoomImage('images/si-db-setup-5.png')" src="images/si-db-setup-5.png"></img>
+							
+							<br>
+							<p>➣ Select <span class="f-red"><b>StickerStore.sql</b></span> file and press <span class="f-red"><b>Go</b></span> button below left side.</p>
+						    <img onclick="zoomImage('images/si-db-setup-6.png')" src="images/si-db-setup-6.png"></img>
+						    
+							<br>
+							<p>➣ You will got the success message as shown in below image.</p>
+						    <img onclick="zoomImage('images/si-db-setup-7.png')" src="images/si-db-setup-7.png"></img>
+
+							<br><br>
+						    <p>➣ How to Configure Database Connection into php file. <a class="click-a" href="#SI-db-conn">Click</a></p>
+						  
+                        	<p class="notes">Now the Database setup is finished here & just moved to the next step below..</p>
+
+						</div>
+
+					</div>	
+					
+					<div class="section" id="SI-php-setup">
+
+						<h4>C). Step-3 : How to Setup Admin Panel</h4>
+						
+						<div class="main-section-1">
+								
+							<p>➣ From Dashboard Click on <span class="f-red"><b>File Manager</b></span> as show below image</p>
+							<img onclick="zoomImage('images/si-php-file-00.png')" src="images/si-php-file-00.png" alt=""/>
+							<br>
+							<p>➣ Now upload <span class="f-red"><b>admin.zip</b></span> folder into server</p>
+							<img onclick="zoomImage('images/si-php-file-01.png')" src="images/si-php-file-01.png" alt=""/>
+							<br>
+							<p>➣ After upload unzip this folder as shown below image</p>
+							<img onclick="zoomImage('images/si-php-file-02.png')" src="images/si-php-file-02.png" alt=""/>
+							<br>
+							<p class="notes">Now the Plugin Code setup is finished here move to the next step below..</p>
+
+						</div>
+
+					</div>	
+
+					<div class="section" id="SI-db-conn">
+
+						<h4>D). Step-4 : Configure Database Connection</h4>
+						
+						<div class="main-section-1">
+								
+							<p>➣ Open <span class="f-red"><b> <i class="fa fa-folder-open-o"></i> admin</b></span> > <span class="f-red"><b> <i class="fa fa-folder-open-o"></i> controller</b></span> > <span class="f-red"><b> dataController.php</b></span> file into code editor software and change the following credential as per Database.</p>
+																								
+
+<pre class="hljs" style="display: block; overflow-x: auto; padding: 0.5em; background: rgb(43, 43, 43) none repeat scroll 0% 0%; color: rgb(186, 186, 186);"><span class="hljs-comment" style="color: rgb(127, 127, 127);">//host , User , Pass , DB Name</span>
+$conn = <span class="hljs-keyword" style="color: rgb(203, 120, 50);">new</span> mysqli(<span class="hljs-string" style="color: rgb(224, 196, 108);">"localhost"</span>, <span class="hljs-string" style="color: rgb(224, 196, 108);">"root"</span>, <span class="hljs-string" style="color: rgb(224, 196, 108);">""</span>, <span class="hljs-string" style="color: rgb(224, 196, 108);">"wa_sticker"</span>);</pre>
+
+						</div>
+
+					</div>
+
+					<div class="section" id="SI-run">
+
+						<h4>E). Step-5 : </h4>
+						
+						<div class="main-section-1">
+								
+							<p>➣ Open <span class="f-red"><b> Browser</b></span> and run the Backend to type located plugin path : <span class="f-red"><b>http://www.domain.com/admin/</b></span> as show below image</p>
+							
+							<img onclick="zoomImage('images/si-run-admin.png')" src="images/si-run-admin.png" alt=""/>
+
+						</div>
+
+					</div>
+
+				</div>
+			</div>	
+		</div>
+		<br>
+		
+		<div class="row" id="api-configuration">
+			<div class="col-lg-12 col-md-12 col-sm-12 col-12">	
+				<div class="configuration">
+					<hr>
+					<h3>API Configuration</h3>
+					<hr>	
+					
+					<div class="section" id="SI-php-setup">
+
+						<h4>A). Step-1 : Setup Web API</h4>
+
+						<div class="main-section-1">
+							<p>➣ Get Login and Open Your hostinge account</p>	
+							<p>➣ From Dashboard Click on <span class="f-red"><b>File Manager</b></span> as show below image</p>
+							<img onclick="zoomImage('images/api-php-file-00.png')" src="images/api-php-file-00.png" alt=""/>
+							<br>
+							<p>➣ Now upload <span class="f-red"><b>services.zip</b></span> folder into server</p>
+							<img onclick="zoomImage('images/api-php-file-01.png')" src="images/api-php-file-01.png" alt=""/>
+							<br>
+							<p>➣ After upload unzip this folder as shown below image</p>
+							<img onclick="zoomImage('images/api-php-file-02.png')" src="images/api-php-file-02.png" alt=""/>
+							<br>
+							<p class="notes">Now the Plugin Code setup is finished here move to the next step below..</p>
+
+						</div>
+
+					</div>	
+
+					<div class="section" id="SI-db-conn">
+
+						<h4>B). Step-2 : Configure Database Connection</h4>
+						
+						<div class="main-section-1">
+								
+							<p>➣ Open <span class="f-red"><b> <i class="fa fa-folder-open-o"></i> services</b></span> > <span class="f-red"><b> <i class="fa fa-folder-open-o"></i> controller</b></span> > <span class="f-red"><b> dataController.php</b></span> file into code editor software and change the following credential as per Database.</p>
+																								
+
+<pre class="hljs" style="display: block; overflow-x: auto; padding: 0.5em; background: rgb(43, 43, 43) none repeat scroll 0% 0%; color: rgb(186, 186, 186);"><span class="hljs-comment" style="color: rgb(127, 127, 127);">//host , User , Pass , DB Name</span>
+$conn = <span class="hljs-keyword" style="color: rgb(203, 120, 50);">new</span> mysqli(<span class="hljs-string" style="color: rgb(224, 196, 108);">"localhost"</span>, <span class="hljs-string" style="color: rgb(224, 196, 108);">"root"</span>, <span class="hljs-string" style="color: rgb(224, 196, 108);">""</span>, <span class="hljs-string" style="color: rgb(224, 196, 108);">"wa_sticker"</span>);</pre>
+
+						</div>
+
+					</div>
+					
+					<div class="section" id="SI-db-conn">
+
+						<h4>C). Step-3 : Set Web API URL into Application.</h4>
+						
+						<div class="main-section-1">
+								
+							<p> Here you have the similler type of API link for example : <span class="f-red"><b> http://www.domain.com/services/ </span></b> and you need to set it into Application <a href="#set_api_url"><span class="f-red"><b> Set API URL </span></b></a></p>
+
+						</div>
+
+					</div>
+					
+				</div>		
+			</div>	
+		</div>
+		<br>
+
+		<div class="row" id="requirements">
+			<div class="col-lg-12 col-md-12 col-sm-12 col-12">	
+				<div class="requirements">
+                    <hr>
+                    <h3>Android Application Setup</h3>
+                    <hr>
+					<hr>
+					<h3>Requirements</h3>
+					<hr>					
+					<ol>
+				        <li>Android Studio 3.5.3  :<a class="atv" href="https://developer.android.com/studio" target="_blank"><u>Download</u></a></li>
+				    </ol>
+				</div>
+			</div>	
+		</div>
+		<br>
+		<div class="row" id="configuration">
+			<div class="col-lg-12 col-md-12 col-sm-12 col-12">	
+				<div class="configuration">
+					<hr>
+					<h3>Configuration</h3>
+					<hr>
+					<div class="section">
+						<ol type="A">
+					        <li><a href="#open_app_xcode">Open Android Application into Android Studio</a></li>
+					        <li><a href="#app_id_xcode">Change package name in application</a></li>
+					        <li><a href="#basic_configuration">Change Application Name</a></li>
+                            <li><a href="#basic_icon">Change Application Icon</a></li>
+					        <li><a href="#set_api_url">Change Server URL</a></li>
+					        <li><a href="#app_customization">Create Firebase Account</a></li>
+					        <li><a href="#one_signal">SetUp One Signal Notification</a></li>
+					        <li><a href="#set_admob">Setup AdMob</a></li>
+					        
+					    </ol>
+				    </div>
+					<div class="section" id="open_app_xcode">					
+						<h4>A). Open Android Application into Android Studio</h4>
+						<div class="main-section-1">
+							<p><b>Step 1:</b> Open Android Studio -> Open your project by clicking on "Open an existing Android Studio Project"</p>
+                            <p><b>Step 2:</b> Select your downloaded project folder</p>
+							<div class="sub-section-1"><img class="step-img" src="images/open_android_app_1.png" alt=""></div>
+						</div>						
+					</div>
+					<div class="section" id="app_id_xcode">
+						<h4>B). Change package name in application</h4>
+						<div class="main-section-1">
+							<p><b>Step 1:</b> After opening project , Click on setting icon as shown in below image</p>
+							<p><b>Step 2:</b> Unckeck <span class="atv">"Compact Middle Packages"</span> option</p>
+							<div class="sub-section-1"><img class="step-img" src="images/change_package_1.png" alt=""></div>
+                            
+							<p><b>Step 3:</b> Right click on <span class="atv">wxsticker</span> -> Click on <span class="atv">Refactor</span> -> Click on <span class="atv">Rename</span></p>
+                            <div class="sub-section-1"><img class="step-img" src="images/change_package_2.png" alt=""></div>
+                            
+							<p><b>Step 4:</b> Click on<span class="atv">Rename Package</span> from the popup.</p>
+							<div class="sub-section-1"><img class="step-img" src="images/change_package_3.png" alt=""></div>
+                            
+							<p><b>Step 5:</b> Write your package name -> Select both the checkbox as shown in below image -> Click on <span class="atv">Refactor</span></p>
+							<div class="sub-section-1"><img class="step-img" src="images/change_package_4.png" alt=""></div>
+                            
+                            <p>Congratulations.. You successfully changed package name.</p>
+						</div>
+					</div>
+					<div class="section" id="basic_configuration">
+						<h4>C). Change Application Name</h4>
+						<div class="main-section-1">
+							<p><b>Step 1:</b> Click on <span class="atv">res</span></p>
+                            <p><b>Step 2:</b> Click on <span class="atv">values</span> -> Click on <span class="atv">strings.xml</span></p>
+                            <p><b>Step 3:</b> Click on <span class="atv">Replace <span class="atv">Sticker</span> with your application name as shown in below image</span></p>
+                            <p><b>Step 4 (Optional):</b> Change other string as you change in step-3 if you want.</p>
+							<div class="sub-section-1"><img class="step-img" src="images/change_app_name.png" alt=""></div>
+                            
+						</div>
+					</div>
+                    
+                    <div class="section" id="basic_icon">
+                        <h4>C). Change Application Icon</h4>
+                        <div class="main-section-1">
+                            <p><b>-></b> Click on <span class="atv">res</span></p>
+                            <p><b>-></b> Click on <span class="atv">New</span>
+                            <p><b>-></b> Click on <span class="atv">Image Asset</span></p>
+                            <div class="sub-section-1"><img class="step-img" src="images/app_icon_1.png" alt=""></div>
+                            
+                            <p><b>-></b> Select Your App Icon</p>
+                            <p><b>-></b> Select <span class="atv">Yes</span></p>
+                            <p><b>-></b> Click on <span class="atv">Next</span> button.</p>
+                            <div class="sub-section-1"><img class="step-img" src="images/app_icon_2.png" alt=""></div>
+                            
+                            <p><b>-></b> Click on <span class="atv">res</span></p>
+                            <p><b>-></b> Click on <span class="atv">Finish</span> button.</p>
+                            <div class="sub-section-1"><img class="step-img" src="images/app_icon_3.png" alt=""></div>
+                            
+                            <p><b>Congratulations..</b> You have successfully changed your application icon.</p>
+                            
+                        </div>
+                    </div>
+                    
+                    
+					<div class="section" id="set_api_url">
+						<h4>D). Change Server URL</h4>
+						<div class="main-section-1">
+							<p><b>Step 1:</b> Click on <span class="atv">java</span></p>
+                            <p><b>Step 2:</b> Click on <span class="atv">wxsticker</span></p>
+                            <p><b>Step 3:</b> Click on <span class="atv">constant</span></p>
+                            <p><b>Step 4:</b> Change your server URL as shown in below image</p>
+							<div class="sub-section-1"><img class="step-img" src="images/change_app_url.png" alt=""></div>
+						</div>
+					</div>
+                    
+					<div class="section" id="app_customization">
+						<h4>E). Create Firebase Account</h4>
+						<div class="main-section-1">
+                            
+                            <p><b>NOTE :</b> We must setup firebase to setup OneSignal notification in app that is discussed in next topic.</p>
+                            
+							<p><b>Step 1: Open Firebase Console and login <a class="atv" href="https://console.firebase.google.com/u/0/" target="_blank"><u>Firebase Console</u></a></b></p>
+							<ul>
+								<li>➣ Click on <span class="atv">Create a project</span></u></a></li>
+							</ul>
+							<div class="sub-section-1"><img class="step-img" src="images/notification_firebase_1.png" alt=""></div>
+								
+								
+							<p><b>Step 2:</b></p>
+                            <ul>
+                                <li>➣ Write your project name</a></li>
+                            </ul>
+							<ul>
+                                <li>➣ Click on <span class="atv">Continue</span></u></a></li>
+                            </ul>
+							<div class="sub-section-1"><img class="step-img" src="images/notification_firebase_2.png" alt=""></div>
+                            <ul>
+                                <li>➣ Turn off <span class="atv">Enable Google Analytics for this project</span></u></a></li>
+                            </ul>
+                            <ul>
+                                <li>➣ Click on <span class="atv">Create project</span></u></a></li>
+                            </ul>
+                            <div class="sub-section-1"><img class="step-img" src="images/notification_firebase_3.png" alt=""></div>
+                            <ul>
+                                <li>➣ Your new project now ready. Click on <span class="atv">Continue</span></u></a></li>
+                            </ul>
+                            <div class="sub-section-1"><img class="step-img" src="images/notification_firebase_4.png" alt=""></div>
+                            
+                            <p><b>Step 3: Register Your Android application into firebase</b></p>
+                            <ul>
+                                <li>➣ Click on <span class="atv">Android</span></u></a></li>
+                            </ul>
+                            <div class="sub-section-1"><img class="step-img" src="images/notification_firebase_5.png" alt=""></div>
+                            
+                            <ul>
+                                <li>➣ Enter your android application package name.</u></a></li>
+                            </ul>
+                            <ul>
+                                <li>➣ Click on <span class="atv">Register app</span></u></a></li>
+                            </ul>
+                            <div class="sub-section-1"><img class="step-img" src="images/notification_firebase_6.png" alt=""></div>
+                            
+                            <ul>
+                                <li>➣ Click on <span class="atv">Next</span></u></a></li>
+                            </ul>
+                            <div class="sub-section-1"><img class="step-img" src="images/notification_firebase_7.png" alt=""></div>
+                            <ul>
+                                <li>➣ Click on <span class="atv">Next</span></u></a></li>
+                            </ul>
+                            <div class="sub-section-1"><img class="step-img" src="images/notification_firebase_8.png" alt=""></div>
+                            <ul>
+                                <li>➣ Click on <span class="atv">Skip this step</span></u></a></li>
+                            </ul>
+                            <div class="sub-section-1"><img class="step-img" src="images/notification_firebase_9.png" alt=""></div>
+                            
+                            
+                            <p><b>Step 4: How to get Server key and Sender ID </b></p>
+                            <ul>
+                                <li>➣ Click on <span class="atv">Setting Icon</span> -> Click on <span class="atv">Project Setting</span></u></a></li>
+                            </ul>
+                            
+                            <div class="sub-section-1" id="firebaseKey"><img class="step-img" src="images/notification_firebase_10.png" alt=""></div>
+                            
+                            <ul>
+                                <li>➣ Click on <span class="atv">Cloud Messaging</span> Tab</li>
+                                <li>➣ Copy the <span class="atv">Server Key</span> (We will use this ServerKey in OneSignal notification setup)</li>
+                                <li>➣ Copy the <span class="atv">Sender ID</span> (We will use this SenderID in OneSignal notification setup)</li>
+                            </ul>
+                            
+                            <div class="sub-section-1"><img class="step-img" src="images/notification_firebase_11.png" alt=""></div>
+                            
+						</div>
+					</div>
+                    
+					<div class="section" id="one_signal">
+						<h4>F). Setup One Signal Notification</h4>
+						<div class="main-section-1">
+							<p><b>Step 1:</b> Open this link <a class="atv" href="https://app.onesignal.com/login" target="_blank">https://app.onesignal.com/login</a>.</p>
+							<p><b>Step 2:</b> Sign In or Sign Up. After successfully SignIn, You get the following Home screen.</p>
+							<p><b>Step 3:</b> Click on <span class="atv">ADD APP</span> button.</p>
+							<div class="sub-section-1"><img class="step-img" src="images/notification_onesignal_1.png" alt=""></div>
+							<p><b>Step 4:</b> You will get the popup and Enter name of your app.</p>
+							<p><b>Step 5:</b> Click on <span class="atv">CREATE</span> button.</p>
+							<div class="sub-section-1"><img class="step-img" src="images/notification_onesignal_2.png" alt=""></div>
+							<p><b>Step 6:</b> Now select <span class="atv">Google Android</span> as platform.</p>
+							<p><b>Step 7:</b> Click on <span class="atv">NEXT” button</span>.</p>
+							<div class="sub-section-1"><img class="step-img" src="images/notification_onesignal_3.png" alt=""></div>
+							
+                            
+                            <p><b>Step 8:</b> Paste the Firebase Server Key from Firebase. <a href="#firebaseKey"><b><u>Get ServerKey</u></b></a>
+                            </p>
+							<p><b>Step 9:</b> Click on <span class="atv">SAVE</span> button.</p>
+							<div class="sub-section-1"><img class="step-img" src="images/notification_onesignal_4.png" alt=""></div>
+                            
+							<p><b>Step 10:</b> Select <span class="atv">Native Android</span> as target SDK.</p>
+							<p><b>Step 11:</b> Click on <span class="atv">NEXT</span> button.</p>
+							<div class="sub-section-1"><img class="step-img" src="images/notification_onesignal_5.png" alt=""></div>
+                            
+							<p><b>Step 12:</b> Now you can see <span class="atv">APP ID</span>. Copy this APP ID.</p>
+                            <div class="sub-section-1"><img class="step-img" src="images/notification_onesignal_6.png" alt=""></div>
+                            
+                            <p><b>Step 13:</b> Now paste that APP ID as shown in following image.</p>
+                            <ul>
+                                <li>➣ Click on <span class="atv">Gradel Scripts</span></li>
+                                <li>➣ Click on <span class="atv">bundle.gradle</span></li>
+                                <li>➣ Paste your <span class="atv">OneSignal APP ID</span></li>
+                                <li>➣ Click on <span class="atv">Sync Now</span> button.</li>
+                                <div class="sub-section-1"><img class="step-img" src="images/notification_onesignal_7.png" alt=""></div>
+                                
+                                
+                                <li>➣ Run application in your real device</li>
+                                <li>➣ Once run in your phone, click on <span class="atv">Check Subscribed User</span> button</li>
+                                <li>➣ Click on <span class="atv">Done</span> button.</li>
+                                <div class="sub-section-1"><img class="step-img" src="images/notification_onesignal_8.png" alt=""></div>
+                            </ul>
+							<p><b>Congratulations! You have successfully implemented OneSignal Notification.</b></p>
+						</div>
+					</div>
+					<div class="section" id="set_admob">
+						<h4>G). Setup AdMob</h4>
+                        <div class="main-section-1">
+							<label><b>➣ </b> Open <a class="atv" href="https://admob.google.com" target="_blank">https://admob.google.com</a>.</label>
+							<br>							
+							<label><b>➣ </b> Sign In or Sign Up with your detail.</label>
+							
+							<p><b>Step 1:</b> Click on <span class="atv">Apps</span>.</p>
+							
+							<p><b>Step 2:</b> Click on <span class="atv">ADD APP</span> button.</p>
+							<div class="sub-section-1"><img class="step-img" src="images/admob_1_2.png" alt=""></div>
+								
+							<p><b>Step 3:</b> Click on <span class="atv">NO</span> button.</p>
+							<div class="sub-section-1"><img class="step-img" src="images/admob_2.png" alt=""></div>
+								
+							<p><b>Step 4:</b> Enter your app name.</p>
+							<p><b>Step 5:</b> select <span class="atv">Android</span> as a platform.</p>
+							<p><b>Step 6:</b> Click on <span class="atv">ADD</span> button.</p>
+							<div class="sub-section-1"><img class="step-img" src="images/admob_3.png" alt=""></div>
+
+							<p><b>Step 7:</b> Now click on <span class="atv">CREATE AD UNIT</span> button.</p>
+							<div class="sub-section-1"><img class="step-img" src="images/admob_4.png" alt=""></div>
+								
+							<p><b>Step 8:</b> Now click on <span class="atv">SELECT</span> button under <span class="atv">Intrestial</span> section.</p>
+							<div class="sub-section-1"><img class="step-img" src="images/admob_5.png" alt=""></div>
+								
+							<p><b>Step 9:</b> Enter Ad Unit Name.</p>
+							<p><b>Step 10:</b> Click on <span class="atv">CREATE AD UNIT</span> button.</p>
+							<div class="sub-section-1"><img class="step-img" src="images/admob_6.png" alt=""></div>
+								
+							<p><b>Step 11:</b> Now copy App ID and Interstitial Ad ID.</p>
+							<div class="sub-section-1"><img class="step-img" src="images/admob_7.png" alt=""></div>
+								
+							<p><b>Step 12:</b> Now paste <span class="atv">Interstitial Ad ID</span> in <span class="atv">String.xml</span> file as shown in following image.</p>
+                                <li>➣ Click on <span class="atv">res</span></li>
+                                <li>➣ Click on <span class="atv">values</span></li>
+                                <li>➣ Paste your <span class="atv">strings.xml</span></li>
+                                <li>➣ Now paste your APP ID and Intrestial Ad ID as shown in following image.</li>
+                                
+                                <div class="sub-section-1"><img class="step-img" src="images/notification_onesignal_8.png" alt=""></div>
+                            </ul>
+                            
+							<div class="sub-section-1"><img class="step-img" src="images/admob_8.png" alt=""></div>
+								
+							<p><b>Congratulations. You have successfully done with AdMob  setup.</b></p>
+						</div>
+					</div>
+				</div>
+			</div>	
+		</div>
+		<br>
+
+		<div class="row" id="sources">
+			<div class="col-lg-12 col-md-12 col-sm-12 col-12">	
+				<div class="sources">
+					<hr>
+					<h3>Sources/Credits</h3>
+					<hr>					
+					<ol>
+				        <li>Google-Mobile-Ads-SDK</li>
+				        <li>OneSignal</li>
+                        <li>retrofit2</li>
+                        <li>picasso</li>
+                        <li>facebook fresco</li>
+				    </ol>								
+				</div>
+			</div>	
+		</div>
+		<br>
+		<div class="row" id="support">
+			<div class="col-lg-12 col-md-12 col-sm-12 col-12">
+				<div class="support">
+					<hr>
+					<h3>Support Desk</h3>
+					<hr>
+					<div class="sub-section">
+						<p>● Please remember you have purchased a very affordable application and you have not paid for a full-time app development agency. Occasionally we will help with small tweaks, but these requests will be put on a lower priority due to their nature. Please be patient, polite and respectful.</p>
+
+						<h4>Support for my items includes:</h4>
+						<p>● Responding to questions or problems regarding the item and its features.</p>
+						<p>● Fixing bugs and reported issues.</p>
+						<p>● Providing updates to ensure compatibility with new software versions</p>
+
+						<h4>Item support does not include:</h4>
+						<p>● Customization and installation services.</p>
+						<p>● Support for third party software and Service.</p>
+
+						<p>Have any queries related to Sticker Store Application. Feel free to contact our support: <a class="atv" href="http://loopinfosol.com/support/" target="_blank">loopinfosol.com</a>. We will try to help you as soon as possible.</p>
+					</div>
+				</div>
+			</div>	
+		</div>
+		<br>
+		<div class="row" id="versionhistory">
+			<div class="col-lg-12 col-md-12 col-sm-12 col-12">
+				<div class="versionhistory">
+					<hr>
+					<h3>Version History</h3>
+					<hr>
+					<p>Version 1.0 - Initial Release</p>
+				</div>
+			</div>	
+		</div>
+		<button onclick="topFunction()" id="myBtn" class="mybtn" title="Go to top">Top</button> 
+	</div>	
+</body>
+	
+	<!-- jQuery library -->
+	<script src="js/jquery.min.js"></script>
+
+	<!-- manual script to set open&close duration -->
+	<script>
+
+		$('a[href*="#"]').on('click', function(e) {
+		 	e.preventDefault()
+
+		 	var id = $(this).attr('id');
+		 	//alert(id);
+		 	if(id != undefined)
+		 	{
+		 		$("a").removeClass("active");
+		 		$("#"+id).addClass("active");
+		 	}
+
+		  	$('html, body').animate(
+		    {
+		     	scrollTop: $($(this).attr('href')).offset().top,
+
+		    },500,'linear')
+		})
+
+		// When the user scrolls down 20px from the top of the document, show the button
+		window.onscroll = function() {scrollFunction()};
+
+		function scrollFunction() {
+		  if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+		    document.getElementById("myBtn").style.display = "block";
+		  } else {
+		    document.getElementById("myBtn").style.display = "none";
+		  }
+		}
+
+		// When the user clicks on the button, scroll to the top of the document
+		function topFunction(){
+			
+		    $('html, body').animate({scrollTop : 0},700);
+		}
+
+	</script>
+
+</html>
