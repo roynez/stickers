@@ -141,6 +141,13 @@ function AppContent() {
             </Layout>
           </ProtectedRoute>
         } />
+        <Route path="/horizontal-banners" element={
+          <ProtectedRoute>
+            <Layout>
+              <HorizontalBanners />
+            </Layout>
+          </ProtectedRoute>
+        } />
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </div>
