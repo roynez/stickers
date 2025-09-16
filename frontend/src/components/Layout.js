@@ -4,7 +4,6 @@ import { useAuth } from '../context/AuthContext';
 import { 
   LayoutDashboard, 
   FolderOpen, 
-  Layers, 
   Sticker, 
   Settings, 
   LogOut, 
@@ -17,7 +16,8 @@ import {
   Banknote,
   Bell,
   Cog,
-  User
+  User,
+  Users
 } from 'lucide-react';
 
 export default function Layout({ children }) {
