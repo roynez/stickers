@@ -232,48 +232,82 @@ class BackendTester:
             self.log_test("Change Password", False, f"Exception: {str(e)}")
             return False
     
-    def test_unified_stickers_get(self):
-        """Test getting unified stickers"""
+    def test_categories_create(self):
+        """Test creating a category for package testing"""
         if not self.auth_token:
-            self.log_test("Unified Stickers GET", False, "No auth token available")
+            self.log_test("Category CREATE", False, "No auth token available")
+            return False
+            
+        try:
+            response = self.session.post(
+                f"{BACKEND_URL}/categories",
+                params={"name": "Test Category", "description": "Category for testing packages"}
+            )
+            
+            if response.status_code == 200:
+                data = response.json()
+                self.test_category_id = data.get("id")
+                self.log_test(
+                    "Category CREATE", 
+                    True, 
+                    f"Created test category: {data.get('name')} (ID: {self.test_category_id})"
+                )
+                return True
+            else:
+                self.log_test(
+                    "Category CREATE", 
+                    False, 
+                    f"Failed with status {response.status_code}",
+                    {"response": response.text}
+                )
+                return False
+                
+        except Exception as e:
+            self.log_test("Category CREATE", False, f"Exception: {str(e)}")
+            return False
+
+    def test_packages_get(self):
+        """Test getting packages"""
+        if not self.auth_token:
+            self.log_test("Packages GET", False, "No auth token available")
             return False
             
         try:
             # Test without filters
-            response = self.session.get(f"{BACKEND_URL}/stickers")
+            response = self.session.get(f"{BACKEND_URL}/packages")
             
             if response.status_code == 200:
                 data = response.json()
                 self.log_test(
-                    "Unified Stickers GET", 
+                    "Packages GET", 
                     True, 
-                    f"Retrieved {len(data)} stickers"
+                    f"Retrieved {len(data)} packages"
                 )
                 
                 # Test with platform filter
-                response = self.session.get(f"{BACKEND_URL}/stickers?platform=ios")
+                response = self.session.get(f"{BACKEND_URL}/packages?platform=ios")
                 if response.status_code == 200:
                     ios_data = response.json()
                     self.log_test(
-                        "Unified Stickers GET (iOS filter)", 
+                        "Packages GET (iOS filter)", 
                         True, 
-                        f"Retrieved {len(ios_data)} iOS stickers"
+                        f"Retrieved {len(ios_data)} iOS packages"
                     )
                 
-                # Test with platform filter
-                response = self.session.get(f"{BACKEND_URL}/stickers?platform=android")
+                # Test with sorting
+                response = self.session.get(f"{BACKEND_URL}/packages?sort_by=popularity")
                 if response.status_code == 200:
-                    android_data = response.json()
+                    sorted_data = response.json()
                     self.log_test(
-                        "Unified Stickers GET (Android filter)", 
+                        "Packages GET (Popularity sort)", 
                         True, 
-                        f"Retrieved {len(android_data)} Android stickers"
+                        f"Retrieved {len(sorted_data)} packages sorted by popularity"
                     )
                 
                 return True
             else:
                 self.log_test(
-                    "Unified Stickers GET", 
+                    "Packages GET", 
                     False, 
                     f"Failed with status {response.status_code}",
                     {"response": response.text}
@@ -281,44 +315,95 @@ class BackendTester:
                 return False
                 
         except Exception as e:
-            self.log_test("Unified Stickers GET", False, f"Exception: {str(e)}")
+            self.log_test("Packages GET", False, f"Exception: {str(e)}")
             return False
     
-    def test_unified_stickers_create(self):
-        """Test creating a unified sticker"""
-        if not self.auth_token:
-            self.log_test("Unified Stickers CREATE", False, "No auth token available")
+    def test_packages_create(self):
+        """Test creating a sticker package"""
+        if not self.auth_token or not self.test_category_id:
+            self.log_test("Packages CREATE", False, "No auth token or category ID available")
             return False
             
         try:
-            sticker_data = {
-                "name": "Test Sticker",
-                "description": "A test sticker for API testing",
-                "category_id": "test-category-id",
-                "files": {
-                    "png": "https://example.com/test-sticker.png",
-                    "webp": "https://example.com/test-sticker.webp"
-                },
+            package_data = {
+                "name": "Test Sticker Package",
+                "description": "A test package for API testing",
+                "category_id": self.test_category_id,
+                "stickers": [
+                    {
+                        "filename": "happy_face.png",
+                        "url": "https://example.com/happy_face.png",
+                        "file_size_kb": 45,
+                        "dimensions": "512x512"
+                    },
+                    {
+                        "filename": "sad_face.png", 
+                        "url": "https://example.com/sad_face.png",
+                        "file_size_kb": 50,
+                        "dimensions": "512x512"
+                    },
+                    {
+                        "filename": "love_face.png",
+                        "url": "https://example.com/love_face.png", 
+                        "file_size_kb": 48,
+                        "dimensions": "512x512"
+                    }
+                ],
                 "platforms": ["ios", "android"],
-                "is_active": True,
                 "is_premium": False,
-                "file_size_mb": 0.5,
-                "dimensions": "512x512"
+                "is_featured": False
             }
             
-            response = self.session.post(f"{BACKEND_URL}/stickers", json=sticker_data)
+            response = self.session.post(f"{BACKEND_URL}/packages", json=package_data)
+            
+            if response.status_code == 200:
+                data = response.json()
+                self.test_package_id = data.get("id")
+                self.log_test(
+                    "Packages CREATE", 
+                    True, 
+                    f"Created package: {data.get('name')} with {data.get('total_stickers')} stickers (ID: {self.test_package_id})"
+                )
+                return True
+            else:
+                self.log_test(
+                    "Packages CREATE", 
+                    False, 
+                    f"Failed with status {response.status_code}",
+                    {"response": response.text}
+                )
+                return False
+                
+        except Exception as e:
+            self.log_test("Packages CREATE", False, f"Exception: {str(e)}")
+            return False
+
+    def test_packages_update(self):
+        """Test updating a package"""
+        if not self.auth_token or not self.test_package_id:
+            self.log_test("Packages UPDATE", False, "No auth token or package ID available")
+            return False
+            
+        try:
+            update_data = {
+                "name": "Updated Test Package",
+                "description": "Updated description for testing",
+                "is_featured": True
+            }
+            
+            response = self.session.put(f"{BACKEND_URL}/packages/{self.test_package_id}", json=update_data)
             
             if response.status_code == 200:
                 data = response.json()
                 self.log_test(
-                    "Unified Stickers CREATE", 
+                    "Packages UPDATE", 
                     True, 
-                    f"Created sticker: {data.get('sticker', {}).get('name', 'Unknown')}"
+                    f"Updated package: {data.get('name')} (Featured: {data.get('is_featured')})"
                 )
                 return True
             else:
                 self.log_test(
-                    "Unified Stickers CREATE", 
+                    "Packages UPDATE", 
                     False, 
                     f"Failed with status {response.status_code}",
                     {"response": response.text}
@@ -326,7 +411,201 @@ class BackendTester:
                 return False
                 
         except Exception as e:
-            self.log_test("Unified Stickers CREATE", False, f"Exception: {str(e)}")
+            self.log_test("Packages UPDATE", False, f"Exception: {str(e)}")
+            return False
+
+    def test_sticker_management(self):
+        """Test adding and removing stickers from packages"""
+        if not self.auth_token or not self.test_package_id:
+            self.log_test("Sticker Management", False, "No auth token or package ID available")
+            return False
+            
+        try:
+            # Test adding stickers to package
+            add_stickers_data = {
+                "stickers": [
+                    {
+                        "filename": "new_sticker.png",
+                        "url": "https://example.com/new_sticker.png",
+                        "file_size_kb": 52,
+                        "dimensions": "512x512"
+                    }
+                ]
+            }
+            
+            response = self.session.post(f"{BACKEND_URL}/packages/{self.test_package_id}/stickers", json=add_stickers_data)
+            
+            if response.status_code == 200:
+                data = response.json()
+                self.log_test(
+                    "Add Stickers to Package", 
+                    True, 
+                    f"Added stickers to package. New total: {data.get('new_total')}"
+                )
+                
+                # Get package to find a sticker ID for removal test
+                package_response = self.session.get(f"{BACKEND_URL}/packages")
+                if package_response.status_code == 200:
+                    packages = package_response.json()
+                    test_package = next((p for p in packages if p["id"] == self.test_package_id), None)
+                    
+                    if test_package and test_package.get("stickers"):
+                        # Try to remove the last sticker (but ensure we keep minimum required)
+                        if len(test_package["stickers"]) > 3:  # Keep minimum stickers
+                            sticker_to_remove = test_package["stickers"][-1]["id"]
+                            
+                            remove_response = self.session.delete(f"{BACKEND_URL}/packages/{self.test_package_id}/stickers/{sticker_to_remove}")
+                            
+                            if remove_response.status_code == 200:
+                                remove_data = remove_response.json()
+                                self.log_test(
+                                    "Remove Sticker from Package", 
+                                    True, 
+                                    f"Removed sticker. Remaining: {remove_data.get('remaining_stickers')}"
+                                )
+                            else:
+                                self.log_test(
+                                    "Remove Sticker from Package", 
+                                    False, 
+                                    f"Failed with status {remove_response.status_code}"
+                                )
+                        else:
+                            self.log_test(
+                                "Remove Sticker from Package", 
+                                True, 
+                                "Skipped removal test to maintain minimum sticker count"
+                            )
+                
+                return True
+            else:
+                self.log_test(
+                    "Add Stickers to Package", 
+                    False, 
+                    f"Failed with status {response.status_code}",
+                    {"response": response.text}
+                )
+                return False
+                
+        except Exception as e:
+            self.log_test("Sticker Management", False, f"Exception: {str(e)}")
+            return False
+
+    def test_popularity_system(self):
+        """Test package popularity system (likes and downloads)"""
+        if not self.test_package_id:
+            self.log_test("Popularity System", False, "No test package ID available")
+            return False
+            
+        try:
+            # Test liking a package (public endpoint - no auth needed)
+            like_response = self.session.post(f"{BACKEND_URL}/packages/{self.test_package_id}/like")
+            
+            if like_response.status_code == 200:
+                like_data = like_response.json()
+                self.log_test(
+                    "Package Like", 
+                    True, 
+                    f"Package liked successfully. New likes: {like_data.get('new_likes_count')}, Rank: {like_data.get('popularity_rank')}"
+                )
+            else:
+                self.log_test(
+                    "Package Like", 
+                    False, 
+                    f"Failed with status {like_response.status_code}",
+                    {"response": like_response.text}
+                )
+                return False
+            
+            # Test recording downloads
+            for platform in ["ios", "android"]:
+                download_response = self.session.post(f"{BACKEND_URL}/packages/{self.test_package_id}/download?platform={platform}")
+                
+                if download_response.status_code == 200:
+                    download_data = download_response.json()
+                    self.log_test(
+                        f"Package Download ({platform})", 
+                        True, 
+                        f"Download recorded for {platform}. Total downloads: {download_data.get('total_downloads')}"
+                    )
+                else:
+                    self.log_test(
+                        f"Package Download ({platform})", 
+                        False, 
+                        f"Failed with status {download_response.status_code}"
+                    )
+                    return False
+            
+            return True
+                
+        except Exception as e:
+            self.log_test("Popularity System", False, f"Exception: {str(e)}")
+            return False
+
+    def test_social_media_config(self):
+        """Test social media configuration endpoints"""
+        if not self.auth_token:
+            self.log_test("Social Media Config", False, "No auth token available")
+            return False
+            
+        try:
+            # Test GET social media config
+            response = self.session.get(f"{BACKEND_URL}/social-media")
+            
+            if response.status_code == 200:
+                data = response.json()
+                self.log_test(
+                    "Social Media GET", 
+                    True, 
+                    f"Retrieved social media config (Show in app: {data.get('show_in_app', False)})"
+                )
+                
+                # Test UPDATE social media config
+                update_data = {
+                    "tiktok": "https://tiktok.com/@testaccount",
+                    "instagram": "https://instagram.com/testaccount",
+                    "show_in_app": True,
+                    "show_in_footer": True
+                }
+                
+                update_response = self.session.put(f"{BACKEND_URL}/social-media", json=update_data)
+                
+                if update_response.status_code == 200:
+                    update_result = update_response.json()
+                    self.log_test(
+                        "Social Media UPDATE", 
+                        True, 
+                        f"Updated social media config with TikTok and Instagram links"
+                    )
+                    
+                    # Test public endpoint
+                    public_response = self.session.get(f"{BACKEND_URL}/public/social-media")
+                    if public_response.status_code == 200:
+                        public_data = public_response.json()
+                        self.log_test(
+                            "Social Media Public GET", 
+                            True, 
+                            f"Public social media endpoint working. Links: {len(public_data.get('links', {}))}"
+                        )
+                    
+                    return True
+                else:
+                    self.log_test(
+                        "Social Media UPDATE", 
+                        False, 
+                        f"Update failed with status {update_response.status_code}"
+                    )
+                    return False
+            else:
+                self.log_test(
+                    "Social Media GET", 
+                    False, 
+                    f"Failed with status {response.status_code}",
+                    {"response": response.text}
+                )
+                return False
+                
+        except Exception as e:
+            self.log_test("Social Media Config", False, f"Exception: {str(e)}")
             return False
     
     def test_firebase_instructions(self):
