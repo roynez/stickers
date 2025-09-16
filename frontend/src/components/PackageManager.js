@@ -19,7 +19,7 @@ import {
   Heart,
   Download,
   Star,
-  Fire,
+  Flame,
   Sparkles,
   DragHandleDots2,
   X,
