@@ -116,18 +116,64 @@ class StickerCreate(BaseModel):
     platforms: StickerPlatforms
     is_active: bool = True
 
+# Enhanced Ad Configuration Models
+class AdMobConfig(BaseModel):
+    banner: Optional[str] = None              # Banner ads
+    interstitial: Optional[str] = None        # Interstitial ads
+    rewarded_interstitial: Optional[str] = None  # Rewarded interstitial (BETA)
+    rewarded: Optional[str] = None            # Rewarded video ads
+    native_advanced: Optional[str] = None     # Native advanced ads
+    app_open: Optional[str] = None            # App open ads
+
+class FacebookAdsConfig(BaseModel):
+    banner: Optional[str] = None              # Banner placement
+    interstitial: Optional[str] = None        # Interstitial placement
+    rewarded_video: Optional[str] = None      # Rewarded video placement
+    native: Optional[str] = None              # Native ads placement
+
+class UnityAdsConfig(BaseModel):
+    game_id: Optional[str] = None             # Unity Game ID
+    banner: Optional[str] = None              # Banner placement
+    interstitial: Optional[str] = None        # Interstitial placement
+    rewarded_video: Optional[str] = None      # Rewarded video placement
+
+class IronSourceConfig(BaseModel):
+    app_key: Optional[str] = None             # IronSource App Key
+    banner: Optional[str] = None              # Banner instance
+    interstitial: Optional[str] = None        # Interstitial instance
+    rewarded_video: Optional[str] = None      # Rewarded video instance
+
+class AppLovinConfig(BaseModel):
+    sdk_key: Optional[str] = None             # AppLovin SDK Key
+    banner: Optional[str] = None              # Banner ad unit
+    interstitial: Optional[str] = None        # Interstitial ad unit
+    rewarded: Optional[str] = None            # Rewarded ad unit
+    native: Optional[str] = None              # Native ad unit
+
 class AdConfig(BaseModel):
-    admob_banner: Optional[str] = None
-    admob_interstitial: Optional[str] = None
-    facebook_banner: Optional[str] = None
-    facebook_interstitial: Optional[str] = None
+    admob: Optional[AdMobConfig] = AdMobConfig()
+    facebook: Optional[FacebookAdsConfig] = FacebookAdsConfig()
+    unity: Optional[UnityAdsConfig] = UnityAdsConfig()
+    ironsource: Optional[IronSourceConfig] = IronSourceConfig()
+    applovin: Optional[AppLovinConfig] = AppLovinConfig()
+
+class MonetizationSettings(BaseModel):
+    ad_frequency: int = 3                     # Show ad every X sticker views
+    reward_amount: int = 10                   # Coins/points for watching rewarded ads
+    banner_refresh_rate: int = 30             # Banner refresh in seconds
+    interstitial_min_interval: int = 60       # Minimum seconds between interstitials
+    enable_test_ads: bool = False             # Show test ads in development
 
 class AppSettings(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     ios: AdConfig
     android: AdConfig
+    monetization: MonetizationSettings = MonetizationSettings()
     app_version: str = "1.0.0"
     maintenance_mode: bool = False
+    privacy_policy_url: Optional[str] = None
+    terms_of_service_url: Optional[str] = None
+    support_email: Optional[str] = None
     updated_date: datetime = Field(default_factory=datetime.utcnow)
 
 class DashboardStats(BaseModel):
