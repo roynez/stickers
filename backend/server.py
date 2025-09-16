@@ -1287,17 +1287,17 @@ async def record_banner_click(banner_id: str):
     return {"message": "Click recorded"}
 
 # ==========================================
-# CATEGORIES WITH THUMBNAILS (UPDATED)
+# CATEGORIES WITH THUMBNAILS
 # ==========================================
 
 @api_router.get("/categories", response_model=List[CategoryWithThumbnail])
-async def get_categories_with_thumbnails(admin = Depends(get_current_admin)):
-    """Get all categories with thumbnails"""
+async def get_categories(admin = Depends(get_current_admin)):
+    """Get all categories with thumbnail support"""
     categories = await db.categories.find({"is_active": True}).sort("name", 1).to_list(100)
     return [CategoryWithThumbnail(**category) for category in categories]
 
 @api_router.post("/categories", response_model=CategoryWithThumbnail)
-async def create_category_with_thumbnail(category_data: CategoryCreate, admin = Depends(get_current_admin)):
+async def create_category(category_data: CategoryCreate, admin = Depends(get_current_admin)):
     """Create new category (thumbnail uploaded separately)"""
     
     category = CategoryWithThumbnail(
