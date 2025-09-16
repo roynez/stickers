@@ -289,82 +289,97 @@ export default function Categories() {
         </div>
       )}
 
+      {/* Upload Guidelines */}
+      {uploadConfig && (
+        <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
+          <div className="flex items-start gap-3">
+            <Info className="h-5 w-5 text-purple-600 flex-shrink-0 mt-0.5" />
+            <div>
+              <h3 className="text-sm font-medium text-purple-900 mb-2">📷 Especificaciones de Miniaturas</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-purple-800">
+                <div>
+                  <p><strong>Tamaño recomendado:</strong> {uploadConfig.category_thumbnails.recommended_size}</p>
+                  <p><strong>Proporción:</strong> {uploadConfig.category_thumbnails.aspect_ratio}</p>
+                </div>
+                <div>
+                  <p><strong>Tamaño máximo:</strong> {uploadConfig.category_thumbnails.max_file_size_mb}MB</p>
+                  <p><strong>Formatos:</strong> {uploadConfig.category_thumbnails.supported_formats.join(', ')}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg max-w-md w-full p-6">
+          <div className="bg-white rounded-lg max-w-lg w-full p-6">
             <h3 className="text-lg font-medium text-gray-900 mb-4">
               {editingCategory ? 'Editar Categoría' : 'Nueva Categoría'}
             </h3>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Nombre
-                </label>
-                <input
-                  type="text"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  URL de Imagen (opcional)
-                </label>
-                <input
-                  type="url"
-                  value={formData.image}
-                  onChange={(e) => setFormData({ ...formData, image: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Plataformas
-                </label>
-                <div className="space-y-2">
-                  <label className="flex items-center">
-                    <input
-                      type="checkbox"
-                      checked={formData.platforms.includes('ios')}
-                      onChange={() => togglePlatform('ios')}
-                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                    />
-                    <span className="ml-2 text-sm text-gray-700 flex items-center gap-1">
-                      <Smartphone className="h-4 w-4" />
-                      iOS
-                    </span>
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div className="grid grid-cols-1 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Nombre de la Categoría
                   </label>
-                  <label className="flex items-center">
-                    <input
-                      type="checkbox"
-                      checked={formData.platforms.includes('android')}
-                      onChange={() => togglePlatform('android')}
-                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                    />
-                    <span className="ml-2 text-sm text-gray-700 flex items-center gap-1">
-                      <Monitor className="h-4 w-4" />
-                      Android
-                    </span>
+                  <input
+                    type="text"
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Descripción (opcional)
                   </label>
+                  <textarea
+                    value={formData.description}
+                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                    rows={3}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="Descripción de la categoría..."
+                  />
                 </div>
               </div>
 
-              <div>
-                <label className="flex items-center">
-                  <input
-                    type="checkbox"
-                    checked={formData.is_active}
-                    onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
-                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                  />
-                  <span className="ml-2 text-sm text-gray-700">Activa</span>
-                </label>
+              {/* Thumbnail Upload */}
+              <div className="border border-gray-200 rounded-lg p-4">
+                <h4 className="text-sm font-medium text-gray-900 mb-3">🖼️ Miniatura de Categoría</h4>
+                <p className="text-xs text-gray-600 mb-4">
+                  Tamaño recomendado: {uploadConfig?.category_thumbnails?.recommended_size} (cuadrada)
+                </p>
+                
+                <input
+                  type="file"
+                  accept=".png,.jpg,.jpeg,.webp"
+                  onChange={handleFileSelect}
+                  className="w-full px-3 py-2 border border-dashed border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+                
+                {selectedFile && (
+                  <div className="mt-2 p-2 bg-purple-50 rounded border border-purple-200">
+                    <p className="text-sm text-purple-800">
+                      📁 {selectedFile.name} ({Math.round(selectedFile.size / 1024)}KB)
+                    </p>
+                  </div>
+                )}
+
+                {editingCategory?.thumbnail_url && !selectedFile && (
+                  <div className="mt-2">
+                    <p className="text-sm text-gray-600 mb-2">Miniatura actual:</p>
+                    <img
+                      src={editingCategory.thumbnail_url}
+                      alt="Current thumbnail"
+                      className="h-20 w-20 object-cover rounded border"
+                    />
+                  </div>
+                )}
               </div>
 
               <div className="flex gap-3 pt-4">
@@ -372,14 +387,16 @@ export default function Categories() {
                   type="button"
                   onClick={closeModal}
                   className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+                  disabled={uploading}
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                  className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+                  disabled={uploading}
                 >
-                  {editingCategory ? 'Actualizar' : 'Crear'}
+                  {uploading ? 'Subiendo...' : editingCategory ? 'Actualizar' : 'Crear'} Categoría
                 </button>
               </div>
             </form>
