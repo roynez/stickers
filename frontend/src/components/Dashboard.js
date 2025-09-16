@@ -79,7 +79,7 @@ export default function Dashboard() {
       icon: FolderOpen,
       color: 'text-purple-600',
       bgColor: 'bg-purple-50',
-      change: 'Sin subcategorías'
+      change: 'Sistema unificado'
     },
     {
       title: 'Total Likes',
