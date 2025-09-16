@@ -154,7 +154,7 @@ export default function Dashboard() {
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-gradient-to-r from-orange-100 to-red-100 rounded-lg">
-              <Fire className="h-6 w-6 text-red-600" />
+              <Flame className="h-6 w-6 text-red-600" />
             </div>
             <div>
               <h3 className="text-xl font-semibold text-gray-900">📈 Paquetes Más Populares</h3>
