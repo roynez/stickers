@@ -141,6 +141,13 @@ function AppContent() {
             </Layout>
           </ProtectedRoute>
         } />
+        <Route path="/social-media" element={
+          <ProtectedRoute>
+            <Layout>
+              <SocialMediaSettings />
+            </Layout>
+          </ProtectedRoute>
+        } />
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </div>
