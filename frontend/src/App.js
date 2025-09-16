@@ -1,53 +1,118 @@
-import { useEffect } from "react";
-import "./App.css";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import axios from "axios";
+import React, { useState, useEffect } from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import axios from 'axios';
+import './App.css';
+
+// Context
+import { AuthProvider, useAuth } from './context/AuthContext';
+
+// Components
+import Login from './components/Login';
+import Dashboard from './components/Dashboard';
+import Categories from './components/Categories';
+import SubCategories from './components/SubCategories';
+import Stickers from './components/Stickers';
+import Settings from './components/Settings';
+import Layout from './components/Layout';
+import { Toaster } from 'sonner';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
-const Home = () => {
-  const helloWorldApi = async () => {
-    try {
-      const response = await axios.get(`${API}/`);
-      console.log(response.data.message);
-    } catch (e) {
-      console.error(e, `errored out requesting / api`);
-    }
-  };
+// Set up axios defaults
+axios.defaults.baseURL = API;
 
-  useEffect(() => {
-    helloWorldApi();
-  }, []);
+// Axios interceptor to add auth token
+axios.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+// Axios interceptor to handle auth errors
+axios.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('admin');
+      window.location.href = '/login';
+    }
+    return Promise.reject(error);
+  }
+);
+
+function ProtectedRoute({ children }) {
+  const { admin } = useAuth();
+  return admin ? children : <Navigate to="/login" />;
+}
+
+function AppContent() {
+  const { admin, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
 
   return (
-    <div>
-      <header className="App-header">
-        <a
-          className="App-link"
-          href="https://emergent.sh"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <img src="https://avatars.githubusercontent.com/in/1201222?s=120&u=2686cf91179bbafbc7a71bfbc43004cf9ae1acea&v=4" />
-        </a>
-        <p className="mt-5">Building something incredible ~!</p>
-      </header>
+    <div className="App">
+      <Toaster position="top-right" richColors />
+      <Routes>
+        <Route path="/login" element={!admin ? <Login /> : <Navigate to="/" />} />
+        <Route path="/" element={
+          <ProtectedRoute>
+            <Layout>
+              <Dashboard />
+            </Layout>
+          </ProtectedRoute>
+        } />
+        <Route path="/categories" element={
+          <ProtectedRoute>
+            <Layout>
+              <Categories />
+            </Layout>
+          </ProtectedRoute>
+        } />
+        <Route path="/subcategories" element={
+          <ProtectedRoute>
+            <Layout>
+              <SubCategories />
+            </Layout>
+          </ProtectedRoute>
+        } />
+        <Route path="/stickers" element={
+          <ProtectedRoute>
+            <Layout>
+              <Stickers />
+            </Layout>
+          </ProtectedRoute>
+        } />
+        <Route path="/settings" element={
+          <ProtectedRoute>
+            <Layout>
+              <Settings />
+            </Layout>
+          </ProtectedRoute>
+        } />
+        <Route path="*" element={<Navigate to="/" />} />
+      </Routes>
     </div>
   );
-};
+}
 
 function App() {
   return (
-    <div className="App">
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Home />}>
-            <Route index element={<Home />} />
-          </Route>
-        </Routes>
-      </BrowserRouter>
-    </div>
+    <BrowserRouter>
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
+    </BrowserRouter>
   );
 }
 
