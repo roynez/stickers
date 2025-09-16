@@ -56,7 +56,23 @@ export default function Dashboard() {
     );
   }
 
+  const getPopularityIcon = (rank) => {
+    if (rank.includes('🔥')) return <Fire className="h-5 w-5 text-red-500" />;
+    if (rank.includes('⭐')) return <Star className="h-5 w-5 text-yellow-500" />;
+    if (rank.includes('📈')) return <TrendingUp className="h-5 w-5 text-green-500" />;
+    if (rank.includes('👍')) return <Sparkles className="h-5 w-5 text-blue-500" />;
+    return <Package className="h-5 w-5 text-gray-400" />;
+  };
+
   const statCards = [
+    {
+      title: 'Total Paquetes',
+      value: stats?.total_packages || 0,
+      icon: Package,
+      color: 'text-blue-600',
+      bgColor: 'bg-blue-50',
+      change: `+${stats?.recent_packages || 0} esta semana`
+    },
     {
       title: 'Total Categorías',
       value: stats?.total_categories || 0,
