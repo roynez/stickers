@@ -141,19 +141,16 @@ export default function Categories() {
       setEditingCategory(category);
       setFormData({
         name: category.name,
-        image: category.image || '',
-        platforms: category.platforms,
-        is_active: category.is_active
+        description: category.description || ''
       });
     } else {
       setEditingCategory(null);
       setFormData({
         name: '',
-        image: '',
-        platforms: ['ios', 'android'],
-        is_active: true
+        description: ''
       });
     }
+    setSelectedFile(null);
     setShowModal(true);
   };
 
