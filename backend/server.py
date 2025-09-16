@@ -15,7 +15,14 @@ import jwt
 from enum import Enum
 import shutil
 
-# Import all models
+# Import models
+from package_models import (
+    StickerPackage, StickerPackageCreate, StickerPackageUpdate, StickerFile,
+    AddStickersToPackage, ReorderStickers, SocialMediaLinks, SocialMediaUpdate,
+    PopularityMetrics, PackageAnalytics, PopularityCalculator, PackageResponse,
+    PackageListResponse, STICKER_FORMATS, MAX_STICKERS_PER_PACKAGE, MIN_STICKERS_PER_PACKAGE
+)
+
 from subscription_models import (
     SubscriptionPlan, SubscriptionPlanCreate, UserSubscription, UserSubscriptionCreate,
     SubscriptionStats, SubscriptionCheck, SubscriptionStatus, SubscriptionPlatform,
@@ -30,10 +37,8 @@ from advanced_models import (
 )
 
 from unified_models import (
-    UnifiedSticker, UnifiedStickerCreate, StickerFiles, AdminUser, AdminCreate, AdminUpdate,
-    PasswordChange, FirebaseConfig, NotificationTemplate, PlatformStats, UnifiedAnalytics,
-    UserSegment, AppStoreConfig, SystemSettings, StickerUploadResponse, PlatformStickerResponse,
-    DEFAULT_FIREBASE_INSTRUCTIONS
+    AdminUser, AdminCreate, AdminUpdate, PasswordChange, FirebaseConfig, NotificationTemplate,
+    UserSegment, AppStoreConfig, SystemSettings, DEFAULT_FIREBASE_INSTRUCTIONS
 )
 
 ROOT_DIR = Path(__file__).parent
@@ -49,96 +54,23 @@ SECRET_KEY = os.environ.get('JWT_SECRET_KEY', 'your-secret-key-change-this')
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 1440  # 24 hours
 
-# Create the main app
-app = FastAPI(title="Unified Sticker Admin Panel", version="4.0.0")
-
-# Create a router with the /api prefix
-api_router = APIRouter(prefix="/api")
-
 # Security
 security = HTTPBearer()
+api_router = APIRouter(prefix="/api")
 
-# Enums
-class Platform(str, Enum):
-    IOS = "ios"
-    ANDROID = "android"
+# Create FastAPI app
+app = FastAPI(title="WhatsApp Sticker Package Manager", version="5.0.0")
 
-# Existing Models (keeping core ones for categories)
-class AdminLogin(BaseModel):
-    email: str
-    password: str
+# CORS configuration
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-class AdminResponse(BaseModel):
-    id: str
-    email: str
-    name: str
-    token: str
-
-class Category(BaseModel):
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    name: str
-    image: Optional[str] = None
-    platforms: List[Platform] = [Platform.IOS, Platform.ANDROID]
-    is_active: bool = True
-    is_premium: bool = False
-    sticker_count_ios: int = 0
-    sticker_count_android: int = 0
-    created_date: datetime = Field(default_factory=datetime.utcnow)
-    updated_date: datetime = Field(default_factory=datetime.utcnow)
-
-class CategoryCreate(BaseModel):
-    name: str
-    image: Optional[str] = None
-    platforms: List[Platform] = [Platform.IOS, Platform.ANDROID]
-    is_active: bool = True
-    is_premium: bool = False
-
-class SubCategory(BaseModel):
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    category_id: str
-    name: str
-    image: Optional[str] = None
-    platforms: List[Platform] = [Platform.IOS, Platform.ANDROID]
-    is_active: bool = True
-    is_premium: bool = False
-    sticker_count_ios: int = 0
-    sticker_count_android: int = 0
-    created_date: datetime = Field(default_factory=datetime.utcnow)
-    updated_date: datetime = Field(default_factory=datetime.utcnow)
-
-class SubCategoryCreate(BaseModel):
-    category_id: str
-    name: str
-    image: Optional[str] = None
-    platforms: List[Platform] = [Platform.IOS, Platform.ANDROID]
-    is_active: bool = True
-    is_premium: bool = False
-
-class DashboardStats(BaseModel):
-    total_categories: int
-    total_subcategories: int
-    total_stickers: int
-    recent_uploads: int
-    # Platform-specific stats
-    ios_stats: PlatformStats
-    android_stats: PlatformStats
-    # Subscription stats
-    total_subscribers: int
-    monthly_revenue: float
-    active_subscriptions: int
-    # Advanced stats
-    total_banners: int
-    active_banners: int
-    total_notifications_sent: int
-    cross_platform_stickers: int
-
-# Helper Functions
-def hash_password(password: str) -> str:
-    return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
-
-def verify_password(password: str, hashed: str) -> bool:
-    return bcrypt.checkpw(password.encode('utf-8'), hashed.encode('utf-8'))
-
+# Authentication functions
 def create_access_token(data: dict):
     to_encode = data.copy()
     expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
@@ -146,490 +78,952 @@ def create_access_token(data: dict):
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 
+def verify_password(plain_password, hashed_password):
+    return bcrypt.checkpw(plain_password.encode('utf-8'), hashed_password.encode('utf-8'))
+
+def get_password_hash(password):
+    return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+
 async def get_current_admin(credentials: HTTPAuthorizationCredentials = Depends(security)):
     try:
         payload = jwt.decode(credentials.credentials, SECRET_KEY, algorithms=[ALGORITHM])
-        admin_id: str = payload.get("sub")
+        admin_id = payload.get("sub")
         if admin_id is None:
             raise HTTPException(status_code=401, detail="Invalid token")
-        
-        admin = await db.admin_users.find_one({"id": admin_id, "is_active": True})
-        if admin is None:
-            raise HTTPException(status_code=401, detail="Admin not found")
-        
-        # Update last login
-        await db.admin_users.update_one(
-            {"id": admin_id},
-            {"$set": {"last_login": datetime.utcnow()}}
-        )
-        
-        return admin
-    except jwt.PyJWTError:
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(status_code=401, detail="Token has expired")
+    except jwt.JWTError:
         raise HTTPException(status_code=401, detail="Invalid token")
+    
+    admin = await db.admins.find_one({"id": admin_id})
+    if admin is None:
+        raise HTTPException(status_code=401, detail="Admin not found")
+    
+    return AdminUser(**admin)
 
-# AUTH ROUTES
-@api_router.post("/auth/login", response_model=AdminResponse)
-async def login(admin_data: AdminLogin):
-    admin = await db.admin_users.find_one({"email": admin_data.email, "is_active": True})
-    if not admin or not verify_password(admin_data.password, admin["password"]):
+# ==========================================
+# AUTHENTICATION ROUTES
+# ==========================================
+
+@api_router.post("/init-admin")
+async def initialize_admin():
+    """Create default admin if none exists"""
+    existing_admin = await db.admins.find_one({})
+    
+    if existing_admin:
+        return {"message": "Admin already exists"}
+    
+    default_admin = AdminUser(
+        email="admin@stickers.com",
+        name="Administrator",
+        password=get_password_hash("admin123")
+    )
+    
+    await db.admins.insert_one(default_admin.dict())
+    return {"message": "Default admin created successfully"}
+
+@api_router.post("/auth/login")
+async def login(email: str = None, password: str = None):
+    if not email or not password:
+        raise HTTPException(status_code=400, detail="Email and password required")
+    
+    admin = await db.admins.find_one({"email": email})
+    if not admin or not verify_password(password, admin["password"]):
         raise HTTPException(status_code=401, detail="Invalid credentials")
     
-    token = create_access_token({"sub": admin["id"], "email": admin["email"]})
-    return AdminResponse(
-        id=admin["id"],
-        email=admin["email"], 
-        name=admin["name"],
-        token=token
+    if not admin.get("is_active", True):
+        raise HTTPException(status_code=401, detail="Account is inactive")
+    
+    # Update last login
+    await db.admins.update_one(
+        {"id": admin["id"]},
+        {"$set": {"last_login": datetime.utcnow()}}
+    )
+    
+    # Create token
+    access_token = create_access_token(data={"sub": admin["id"]})
+    
+    return {
+        "token": access_token,
+        "id": admin["id"],
+        "email": admin["email"],
+        "name": admin["name"]
+    }
+
+# ==========================================
+# DASHBOARD & ANALYTICS
+# ==========================================
+
+@api_router.get("/dashboard/stats")
+async def get_dashboard_stats(admin = Depends(get_current_admin)):
+    """Get comprehensive dashboard statistics"""
+    
+    # Basic counts
+    total_packages = await db.sticker_packages.count_documents({"is_active": True})
+    total_categories = await db.categories.count_documents({"is_active": True})
+    
+    # Recent activity (last 7 days)
+    seven_days_ago = datetime.utcnow() - timedelta(days=7)
+    recent_packages = await db.sticker_packages.count_documents({
+        "created_date": {"$gte": seven_days_ago}
+    })
+    
+    # Platform statistics
+    ios_packages = await db.sticker_packages.count_documents({
+        "platforms": "ios",
+        "is_active": True
+    })
+    
+    android_packages = await db.sticker_packages.count_documents({
+        "platforms": "android", 
+        "is_active": True
+    })
+    
+    cross_platform_packages = await db.sticker_packages.count_documents({
+        "platforms": {"$all": ["ios", "android"]},
+        "is_active": True
+    })
+    
+    # Download statistics
+    total_downloads_pipeline = [
+        {"$group": {
+            "_id": None,
+            "ios_downloads": {"$sum": "$downloads_ios"},
+            "android_downloads": {"$sum": "$downloads_android"},
+            "total_likes": {"$sum": "$likes_count"}
+        }}
+    ]
+    
+    download_stats = await db.sticker_packages.aggregate(total_downloads_pipeline).to_list(1)
+    download_data = download_stats[0] if download_stats else {
+        "ios_downloads": 0, "android_downloads": 0, "total_likes": 0
+    }
+    
+    # Top categories
+    top_categories_pipeline = [
+        {"$lookup": {
+            "from": "categories",
+            "localField": "category_id", 
+            "foreignField": "id",
+            "as": "category"
+        }},
+        {"$unwind": "$category"},
+        {"$group": {
+            "_id": "$category_id",
+            "category_name": {"$first": "$category.name"},
+            "package_count": {"$sum": 1},
+            "total_downloads": {"$sum": {"$add": ["$downloads_ios", "$downloads_android"]}},
+            "total_likes": {"$sum": "$likes_count"}
+        }},
+        {"$sort": {"total_downloads": -1}},
+        {"$limit": 5}
+    ]
+    
+    top_categories = await db.sticker_packages.aggregate(top_categories_pipeline).to_list(5)
+    
+    return {
+        "total_packages": total_packages,
+        "total_categories": total_categories,
+        "recent_packages": recent_packages,
+        "ios_packages": ios_packages,
+        "android_packages": android_packages,
+        "cross_platform_packages": cross_platform_packages,
+        "total_downloads_ios": download_data["ios_downloads"],
+        "total_downloads_android": download_data["android_downloads"],
+        "total_likes": download_data["total_likes"],
+        "top_categories": top_categories,
+        "total_downloads": download_data["ios_downloads"] + download_data["android_downloads"]
+    }
+
+@api_router.get("/dashboard/popular-packages")
+async def get_popular_packages(limit: int = 10, admin = Depends(get_current_admin)):
+    """Get most popular packages with detailed metrics"""
+    
+    packages = await db.sticker_packages.find(
+        {"is_active": True}
+    ).sort("popularity_score", -1).limit(limit).to_list(limit)
+    
+    popular_packages = []
+    for package in packages:
+        # Get category name
+        category = await db.categories.find_one({"id": package["category_id"]})
+        category_name = category["name"] if category else "Sin categoría"
+        
+        metrics = PopularityMetrics(
+            package_id=package["id"],
+            package_name=package["name"],
+            category_name=category_name,
+            likes_count=package.get("likes_count", 0),
+            total_downloads=package.get("downloads_ios", 0) + package.get("downloads_android", 0),
+            downloads_ios=package.get("downloads_ios", 0),
+            downloads_android=package.get("downloads_android", 0),
+            recent_downloads_7d=package.get("recent_downloads_7d", 0),
+            popularity_score=package.get("popularity_score", 0),
+            popularity_rank=package.get("popularity_rank", "📦 Nuevo"),
+            download_trend="stable",  # You could calculate this
+            days_since_creation=(datetime.utcnow() - package["created_date"]).days,
+            like_to_download_ratio=0.0,  # Calculate if needed
+            cross_platform_usage=len(package.get("platforms", [])) > 1
+        )
+        popular_packages.append(metrics)
+    
+    return popular_packages
+
+# ==========================================
+# CATEGORIES MANAGEMENT (Simplified - No Subcategories)
+# ==========================================
+
+@api_router.get("/categories")
+async def get_categories(admin = Depends(get_current_admin)):
+    """Get all categories (no subcategories)"""
+    categories = await db.categories.find({"is_active": True}).sort("name", 1).to_list(100)
+    return categories
+
+@api_router.post("/categories")
+async def create_category(name: str, description: str = "", admin = Depends(get_current_admin)):
+    """Create new category"""
+    category = {
+        "id": str(uuid.uuid4()),
+        "name": name,
+        "description": description,
+        "is_active": True,
+        "package_count": 0,
+        "created_date": datetime.utcnow(),
+        "updated_date": datetime.utcnow()
+    }
+    
+    await db.categories.insert_one(category)
+    return category
+
+@api_router.put("/categories/{category_id}")
+async def update_category(category_id: str, name: str, description: str = "", admin = Depends(get_current_admin)):
+    """Update category"""
+    result = await db.categories.update_one(
+        {"id": category_id},
+        {"$set": {
+            "name": name,
+            "description": description,
+            "updated_date": datetime.utcnow()
+        }}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Category not found")
+    
+    updated_category = await db.categories.find_one({"id": category_id})
+    return updated_category
+
+@api_router.delete("/categories/{category_id}")
+async def delete_category(category_id: str, admin = Depends(get_current_admin)):
+    """Delete category (only if no packages use it)"""
+    # Check if category has packages
+    package_count = await db.sticker_packages.count_documents({"category_id": category_id})
+    if package_count > 0:
+        raise HTTPException(
+            status_code=400, 
+            detail=f"Cannot delete category with {package_count} packages. Move packages first."
+        )
+    
+    result = await db.categories.delete_one({"id": category_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Category not found")
+    
+    return {"message": "Category deleted successfully"}
+
+# ==========================================
+# STICKER PACKAGES MANAGEMENT
+# ==========================================
+
+@api_router.get("/packages", response_model=List[PackageResponse])
+async def get_packages(
+    category_id: str = None,
+    platform: str = None,
+    is_featured: bool = None,
+    sort_by: str = "popularity",  # popularity, created_date, downloads, name
+    page: int = 1,
+    per_page: int = 20,
+    admin = Depends(get_current_admin)
+):
+    """Get sticker packages with filtering and sorting"""
+    
+    # Build query
+    query = {"is_active": True}
+    
+    if category_id:
+        query["category_id"] = category_id
+    
+    if platform:
+        query["platforms"] = platform
+        
+    if is_featured is not None:
+        query["is_featured"] = is_featured
+    
+    # Sorting
+    sort_options = {
+        "popularity": [("popularity_score", -1), ("created_date", -1)],
+        "created_date": [("created_date", -1)],
+        "downloads": [("downloads_ios", -1), ("downloads_android", -1)],
+        "name": [("name", 1)]
+    }
+    
+    sort_criteria = sort_options.get(sort_by, sort_options["popularity"])
+    
+    # Get total count
+    total_count = await db.sticker_packages.count_documents(query)
+    
+    # Get packages with pagination
+    skip = (page - 1) * per_page
+    packages = await db.sticker_packages.find(query).sort(sort_criteria).skip(skip).limit(per_page).to_list(per_page)
+    
+    # Enhance with category names
+    package_responses = []
+    for package in packages:
+        category = await db.categories.find_one({"id": package["category_id"]})
+        category_name = category["name"] if category else "Sin categoría"
+        
+        package_response = PackageResponse(
+            id=package["id"],
+            name=package["name"],
+            description=package.get("description"),
+            category_id=package["category_id"],
+            category_name=category_name,
+            total_stickers=len(package.get("stickers", [])),
+            stickers=package.get("stickers", []),
+            platforms=package.get("platforms", []),
+            is_premium=package.get("is_premium", False),
+            is_featured=package.get("is_featured", False),
+            likes_count=package.get("likes_count", 0),
+            total_downloads=package.get("downloads_ios", 0) + package.get("downloads_android", 0),
+            popularity_rank=package.get("popularity_rank", "📦 Nuevo"),
+            created_date=package["created_date"]
+        )
+        package_responses.append(package_response)
+    
+    return package_responses
+
+@api_router.post("/packages", response_model=PackageResponse)
+async def create_package(package_data: StickerPackageCreate, admin = Depends(get_current_admin)):
+    """Create new sticker package"""
+    
+    # Validate sticker count
+    sticker_count = len(package_data.stickers)
+    if sticker_count < MIN_STICKERS_PER_PACKAGE:
+        raise HTTPException(
+            status_code=400, 
+            detail=f"Package must have at least {MIN_STICKERS_PER_PACKAGE} stickers"
+        )
+    
+    if sticker_count > MAX_STICKERS_PER_PACKAGE:
+        raise HTTPException(
+            status_code=400, 
+            detail=f"Package cannot have more than {MAX_STICKERS_PER_PACKAGE} stickers"
+        )
+    
+    # Process stickers
+    processed_stickers = []
+    total_size_mb = 0
+    
+    for index, sticker_data in enumerate(package_data.stickers):
+        sticker_file = StickerFile(
+            filename=sticker_data.get("filename", f"sticker_{index+1}.png"),
+            url=sticker_data.get("url", ""),
+            file_size_kb=sticker_data.get("file_size_kb", 50),
+            dimensions=sticker_data.get("dimensions", "512x512"),
+            order_index=index
+        )
+        processed_stickers.append(sticker_file.dict())
+        total_size_mb += (sticker_data.get("file_size_kb", 50) / 1024)
+    
+    # Create package
+    package = StickerPackage(
+        name=package_data.name,
+        description=package_data.description,
+        category_id=package_data.category_id,
+        stickers=processed_stickers,
+        total_stickers=len(processed_stickers),
+        platforms=package_data.platforms,
+        is_premium=package_data.is_premium,
+        is_featured=package_data.is_featured,
+        total_size_mb=round(total_size_mb, 2)
+    )
+    
+    # Calculate initial popularity (new package)
+    days_since_creation = 0
+    is_cross_platform = len(package_data.platforms) > 1
+    
+    package.popularity_score = PopularityCalculator.calculate_popularity_score(
+        likes=0,
+        total_downloads=0,
+        recent_downloads_7d=0,
+        days_since_creation=days_since_creation,
+        is_cross_platform=is_cross_platform
+    )
+    package.popularity_rank = PopularityCalculator.get_popularity_rank(package.popularity_score)
+    
+    # Save to database
+    await db.sticker_packages.insert_one(package.dict())
+    
+    # Update category package count
+    await db.categories.update_one(
+        {"id": package_data.category_id},
+        {"$inc": {"package_count": 1}}
+    )
+    
+    # Get category name for response
+    category = await db.categories.find_one({"id": package_data.category_id})
+    category_name = category["name"] if category else "Sin categoría"
+    
+    return PackageResponse(
+        id=package.id,
+        name=package.name,
+        description=package.description,
+        category_id=package.category_id,
+        category_name=category_name,
+        total_stickers=package.total_stickers,
+        stickers=processed_stickers,
+        platforms=package.platforms,
+        is_premium=package.is_premium,
+        is_featured=package.is_featured,
+        likes_count=package.likes_count,
+        total_downloads=0,
+        popularity_rank=package.popularity_rank,
+        created_date=package.created_date
     )
 
-# ADMIN MANAGEMENT ROUTES
+@api_router.put("/packages/{package_id}", response_model=PackageResponse)
+async def update_package(package_id: str, package_data: StickerPackageUpdate, admin = Depends(get_current_admin)):
+    """Update package details (not stickers themselves)"""
+    
+    current_package = await db.sticker_packages.find_one({"id": package_id})
+    if not current_package:
+        raise HTTPException(status_code=404, detail="Package not found")
+    
+    # Build update data
+    update_data = {"updated_date": datetime.utcnow()}
+    
+    if package_data.name is not None:
+        update_data["name"] = package_data.name
+    if package_data.description is not None:
+        update_data["description"] = package_data.description
+    if package_data.category_id is not None:
+        update_data["category_id"] = package_data.category_id
+    if package_data.platforms is not None:
+        update_data["platforms"] = package_data.platforms
+        # Recalculate popularity if platform changes
+        is_cross_platform = len(package_data.platforms) > 1
+        days_since_creation = (datetime.utcnow() - current_package["created_date"]).days
+        
+        new_score = PopularityCalculator.calculate_popularity_score(
+            likes=current_package.get("likes_count", 0),
+            total_downloads=current_package.get("downloads_ios", 0) + current_package.get("downloads_android", 0),
+            recent_downloads_7d=current_package.get("recent_downloads_7d", 0),
+            days_since_creation=days_since_creation,
+            is_cross_platform=is_cross_platform
+        )
+        update_data["popularity_score"] = new_score
+        update_data["popularity_rank"] = PopularityCalculator.get_popularity_rank(new_score)
+        
+    if package_data.is_active is not None:
+        update_data["is_active"] = package_data.is_active
+    if package_data.is_premium is not None:
+        update_data["is_premium"] = package_data.is_premium
+    if package_data.is_featured is not None:
+        update_data["is_featured"] = package_data.is_featured
+    
+    # Update package
+    result = await db.sticker_packages.update_one(
+        {"id": package_id},
+        {"$set": update_data}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Package not found")
+    
+    # Get updated package
+    updated_package = await db.sticker_packages.find_one({"id": package_id})
+    category = await db.categories.find_one({"id": updated_package["category_id"]})
+    category_name = category["name"] if category else "Sin categoría"
+    
+    return PackageResponse(
+        id=updated_package["id"],
+        name=updated_package["name"],
+        description=updated_package.get("description"),
+        category_id=updated_package["category_id"],
+        category_name=category_name,
+        total_stickers=len(updated_package.get("stickers", [])),
+        stickers=updated_package.get("stickers", []),
+        platforms=updated_package.get("platforms", []),
+        is_premium=updated_package.get("is_premium", False),
+        is_featured=updated_package.get("is_featured", False),
+        likes_count=updated_package.get("likes_count", 0),
+        total_downloads=updated_package.get("downloads_ios", 0) + updated_package.get("downloads_android", 0),
+        popularity_rank=updated_package.get("popularity_rank", "📦 Nuevo"),
+        created_date=updated_package["created_date"]
+    )
+
+@api_router.delete("/packages/{package_id}")
+async def delete_package(package_id: str, admin = Depends(get_current_admin)):
+    """Delete entire package"""
+    
+    package = await db.sticker_packages.find_one({"id": package_id})
+    if not package:
+        raise HTTPException(status_code=404, detail="Package not found")
+    
+    # Delete package
+    result = await db.sticker_packages.delete_one({"id": package_id})
+    
+    # Update category count
+    await db.categories.update_one(
+        {"id": package["category_id"]},
+        {"$inc": {"package_count": -1}}
+    )
+    
+    return {"message": f"Package '{package['name']}' deleted successfully"}
+
+# ==========================================
+# INDIVIDUAL STICKER MANAGEMENT IN PACKAGES
+# ==========================================
+
+@api_router.post("/packages/{package_id}/stickers")
+async def add_stickers_to_package(package_id: str, sticker_data: AddStickersToPackage, admin = Depends(get_current_admin)):
+    """Add new stickers to existing package"""
+    
+    package = await db.sticker_packages.find_one({"id": package_id})
+    if not package:
+        raise HTTPException(status_code=404, detail="Package not found")
+    
+    current_stickers = package.get("stickers", [])
+    
+    # Check total limit
+    new_total = len(current_stickers) + len(sticker_data.stickers)
+    if new_total > MAX_STICKERS_PER_PACKAGE:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Package would exceed maximum of {MAX_STICKERS_PER_PACKAGE} stickers"
+        )
+    
+    # Process new stickers
+    next_order_index = len(current_stickers)
+    new_stickers = []
+    
+    for index, sticker in enumerate(sticker_data.stickers):
+        sticker_file = StickerFile(
+            filename=sticker.get("filename", f"sticker_{next_order_index + index + 1}.png"),
+            url=sticker.get("url", ""),
+            file_size_kb=sticker.get("file_size_kb", 50),
+            dimensions=sticker.get("dimensions", "512x512"),
+            order_index=next_order_index + index
+        )
+        new_stickers.append(sticker_file.dict())
+    
+    # Update package
+    all_stickers = current_stickers + new_stickers
+    total_size_mb = sum(s.get("file_size_kb", 50) / 1024 for s in all_stickers)
+    
+    await db.sticker_packages.update_one(
+        {"id": package_id},
+        {"$set": {
+            "stickers": all_stickers,
+            "total_stickers": len(all_stickers),
+            "total_size_mb": round(total_size_mb, 2),
+            "updated_date": datetime.utcnow()
+        }}
+    )
+    
+    return {"message": f"Added {len(new_stickers)} stickers to package", "new_total": len(all_stickers)}
+
+@api_router.delete("/packages/{package_id}/stickers/{sticker_id}")
+async def remove_sticker_from_package(package_id: str, sticker_id: str, admin = Depends(get_current_admin)):
+    """Remove specific sticker from package"""
+    
+    package = await db.sticker_packages.find_one({"id": package_id})
+    if not package:
+        raise HTTPException(status_code=404, detail="Package not found")
+    
+    stickers = package.get("stickers", [])
+    
+    # Find and remove sticker
+    sticker_found = False
+    updated_stickers = []
+    
+    for sticker in stickers:
+        if sticker["id"] != sticker_id:
+            updated_stickers.append(sticker)
+        else:
+            sticker_found = True
+    
+    if not sticker_found:
+        raise HTTPException(status_code=404, detail="Sticker not found in package")
+    
+    # Check minimum stickers
+    if len(updated_stickers) < MIN_STICKERS_PER_PACKAGE:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Package must have at least {MIN_STICKERS_PER_PACKAGE} stickers"
+        )
+    
+    # Reorder remaining stickers
+    for index, sticker in enumerate(updated_stickers):
+        sticker["order_index"] = index
+    
+    # Update package
+    total_size_mb = sum(s.get("file_size_kb", 50) / 1024 for s in updated_stickers)
+    
+    await db.sticker_packages.update_one(
+        {"id": package_id},
+        {"$set": {
+            "stickers": updated_stickers,
+            "total_stickers": len(updated_stickers),
+            "total_size_mb": round(total_size_mb, 2),
+            "updated_date": datetime.utcnow()
+        }}
+    )
+    
+    return {"message": "Sticker removed successfully", "remaining_stickers": len(updated_stickers)}
+
+@api_router.put("/packages/{package_id}/reorder")
+async def reorder_stickers(package_id: str, reorder_data: ReorderStickers, admin = Depends(get_current_admin)):
+    """Reorder stickers within package"""
+    
+    package = await db.sticker_packages.find_one({"id": package_id})
+    if not package:
+        raise HTTPException(status_code=404, detail="Package not found")
+    
+    stickers = package.get("stickers", [])
+    
+    # Create lookup for new orders
+    new_orders = {item["sticker_id"]: item["new_order"] for item in reorder_data.sticker_orders}
+    
+    # Apply new ordering
+    for sticker in stickers:
+        if sticker["id"] in new_orders:
+            sticker["order_index"] = new_orders[sticker["id"]]
+    
+    # Sort by new order
+    stickers.sort(key=lambda x: x["order_index"])
+    
+    # Update package
+    await db.sticker_packages.update_one(
+        {"id": package_id},
+        {"$set": {
+            "stickers": stickers,
+            "updated_date": datetime.utcnow()
+        }}
+    )
+    
+    return {"message": "Stickers reordered successfully"}
+
+# ==========================================
+# POPULARITY & ANALYTICS
+# ==========================================
+
+@api_router.post("/packages/{package_id}/like")
+async def like_package(package_id: str):
+    """Add like to package (public endpoint for mobile apps)"""
+    
+    package = await db.sticker_packages.find_one({"id": package_id})
+    if not package:
+        raise HTTPException(status_code=404, detail="Package not found")
+    
+    # Increment like count
+    new_likes = package.get("likes_count", 0) + 1
+    
+    # Recalculate popularity
+    days_since_creation = (datetime.utcnow() - package["created_date"]).days
+    is_cross_platform = len(package.get("platforms", [])) > 1
+    
+    new_score = PopularityCalculator.calculate_popularity_score(
+        likes=new_likes,
+        total_downloads=package.get("downloads_ios", 0) + package.get("downloads_android", 0),
+        recent_downloads_7d=package.get("recent_downloads_7d", 0),
+        days_since_creation=days_since_creation,
+        is_cross_platform=is_cross_platform
+    )
+    
+    new_rank = PopularityCalculator.get_popularity_rank(new_score)
+    
+    # Update package
+    await db.sticker_packages.update_one(
+        {"id": package_id},
+        {"$set": {
+            "likes_count": new_likes,
+            "popularity_score": new_score,
+            "popularity_rank": new_rank,
+            "updated_date": datetime.utcnow()
+        }}
+    )
+    
+    return {
+        "message": "Package liked successfully",
+        "new_likes_count": new_likes,
+        "popularity_rank": new_rank
+    }
+
+@api_router.post("/packages/{package_id}/download")
+async def record_download(package_id: str, platform: str):
+    """Record package download (public endpoint for mobile apps)"""
+    
+    if platform not in ["ios", "android"]:
+        raise HTTPException(status_code=400, detail="Platform must be 'ios' or 'android'")
+    
+    package = await db.sticker_packages.find_one({"id": package_id})
+    if not package:
+        raise HTTPException(status_code=404, detail="Package not found")
+    
+    # Increment download count
+    field_name = f"downloads_{platform}"
+    new_downloads = package.get(field_name, 0) + 1
+    
+    # Update recent downloads (last 7 days)
+    # In a real implementation, you'd track this more precisely
+    new_recent_downloads = package.get("recent_downloads_7d", 0) + 1
+    
+    # Recalculate popularity
+    days_since_creation = (datetime.utcnow() - package["created_date"]).days
+    is_cross_platform = len(package.get("platforms", [])) > 1
+    total_downloads = package.get("downloads_ios", 0) + package.get("downloads_android", 0) + 1
+    
+    new_score = PopularityCalculator.calculate_popularity_score(
+        likes=package.get("likes_count", 0),
+        total_downloads=total_downloads,
+        recent_downloads_7d=new_recent_downloads,
+        days_since_creation=days_since_creation,
+        is_cross_platform=is_cross_platform
+    )
+    
+    new_rank = PopularityCalculator.get_popularity_rank(new_score)
+    
+    # Update package
+    update_fields = {
+        field_name: new_downloads,
+        "recent_downloads_7d": new_recent_downloads,
+        "popularity_score": new_score,
+        "popularity_rank": new_rank,
+        "last_download_date": datetime.utcnow(),
+        "updated_date": datetime.utcnow()
+    }
+    
+    await db.sticker_packages.update_one(
+        {"id": package_id},
+        {"$set": update_fields}
+    )
+    
+    return {
+        "message": f"Download recorded for {platform}",
+        "total_downloads": total_downloads,
+        "popularity_rank": new_rank
+    }
+
+# ==========================================
+# SOCIAL MEDIA LINKS
+# ==========================================
+
+@api_router.get("/social-media")
+async def get_social_media_links(admin = Depends(get_current_admin)):
+    """Get social media links configuration"""
+    
+    social_links = await db.social_media.find_one({})
+    
+    if not social_links:
+        # Create default empty configuration
+        default_links = SocialMediaLinks()
+        await db.social_media.insert_one(default_links.dict())
+        return default_links
+    
+    return SocialMediaLinks(**social_links)
+
+@api_router.put("/social-media")
+async def update_social_media_links(social_data: SocialMediaUpdate, admin = Depends(get_current_admin)):
+    """Update social media links"""
+    
+    existing_links = await db.social_media.find_one({})
+    
+    if not existing_links:
+        # Create new configuration
+        new_links = SocialMediaLinks(**social_data.dict(exclude_unset=True))
+        await db.social_media.insert_one(new_links.dict())
+        return new_links
+    else:
+        # Update existing configuration
+        update_data = social_data.dict(exclude_unset=True)
+        update_data["updated_date"] = datetime.utcnow()
+        
+        await db.social_media.update_one(
+            {"id": existing_links["id"]},
+            {"$set": update_data}
+        )
+        
+        updated_links = await db.social_media.find_one({"id": existing_links["id"]})
+        return SocialMediaLinks(**updated_links)
+
+@api_router.get("/public/social-media")
+async def get_public_social_media():
+    """Get social media links for public/mobile app use"""
+    
+    social_links = await db.social_media.find_one({"show_in_app": True})
+    
+    if not social_links:
+        return {"links": [], "show_in_app": False}
+    
+    # Return only non-empty links
+    links = {}
+    for platform in ["tiktok", "instagram", "facebook", "twitter_x", "whatsapp_channel"]:
+        if social_links.get(platform):
+            links[platform] = social_links[platform]
+    
+    return {
+        "links": links,
+        "show_in_app": social_links.get("show_in_app", True),
+        "show_in_footer": social_links.get("show_in_footer", True)
+    }
+
+# ==========================================
+# ADMIN PROFILE MANAGEMENT
+# ==========================================
+
 @api_router.get("/admin/profile", response_model=AdminUser)
 async def get_admin_profile(admin = Depends(get_current_admin)):
-    admin_data = await db.admin_users.find_one({"id": admin["id"]})
-    return AdminUser(**admin_data)
+    """Get current admin profile"""
+    return admin
 
 @api_router.put("/admin/profile", response_model=AdminUser)
 async def update_admin_profile(update_data: AdminUpdate, admin = Depends(get_current_admin)):
-    update_dict = {}
+    """Update admin profile"""
     
-    if update_data.email:
-        # Check if email already exists
-        existing = await db.admin_users.find_one({"email": update_data.email, "id": {"$ne": admin["id"]}})
-        if existing:
-            raise HTTPException(status_code=400, detail="Email already exists")
-        update_dict["email"] = update_data.email
+    update_fields = {"updated_date": datetime.utcnow()}
     
     if update_data.name:
-        update_dict["name"] = update_data.name
-    
+        update_fields["name"] = update_data.name
+    if update_data.email:
+        # Check if email already exists
+        existing_admin = await db.admins.find_one({"email": update_data.email, "id": {"$ne": admin.id}})
+        if existing_admin:
+            raise HTTPException(status_code=400, detail="Email already exists")
+        update_fields["email"] = update_data.email
     if update_data.password:
-        update_dict["password"] = hash_password(update_data.password)
-    
+        update_fields["password"] = get_password_hash(update_data.password)
     if update_data.is_active is not None:
-        update_dict["is_active"] = update_data.is_active
+        update_fields["is_active"] = update_data.is_active
     
-    update_dict["updated_date"] = datetime.utcnow()
-    
-    await db.admin_users.update_one(
-        {"id": admin["id"]},
-        {"$set": update_dict}
+    await db.admins.update_one(
+        {"id": admin.id},
+        {"$set": update_fields}
     )
     
-    updated_admin = await db.admin_users.find_one({"id": admin["id"]})
+    updated_admin = await db.admins.find_one({"id": admin.id})
     return AdminUser(**updated_admin)
 
 @api_router.post("/admin/change-password")
 async def change_password(password_data: PasswordChange, admin = Depends(get_current_admin)):
-    admin_data = await db.admin_users.find_one({"id": admin["id"]})
+    """Change admin password"""
     
-    if not verify_password(password_data.current_password, admin_data["password"]):
+    # Verify current password
+    if not verify_password(password_data.current_password, admin.password):
         raise HTTPException(status_code=400, detail="Current password is incorrect")
     
-    new_password_hash = hash_password(password_data.new_password)
+    # Hash new password
+    new_password_hash = get_password_hash(password_data.new_password)
     
-    await db.admin_users.update_one(
-        {"id": admin["id"]},
-        {"$set": {"password": new_password_hash, "updated_date": datetime.utcnow()}}
+    # Update password
+    await db.admins.update_one(
+        {"id": admin.id},
+        {"$set": {
+            "password": new_password_hash,
+            "updated_date": datetime.utcnow()
+        }}
     )
     
     return {"message": "Password changed successfully"}
 
-@api_router.get("/admin/list", response_model=List[AdminUser])
-async def list_admins(admin = Depends(get_current_admin)):
-    admins = await db.admin_users.find({}).to_list(100)
-    # Remove password field for security
-    for admin_user in admins:
-        admin_user.pop("password", None)
-    return [AdminUser(**admin_user) for admin_user in admins]
+@api_router.get("/admin/list")
+async def get_admin_list(admin = Depends(get_current_admin)):
+    """Get list of all admins"""
+    
+    admins = await db.admins.find({}).sort("created_date", -1).to_list(100)
+    
+    # Remove password field from response
+    for admin_record in admins:
+        admin_record.pop("password", None)
+    
+    return admins
 
-@api_router.post("/admin/create", response_model=AdminUser)
+@api_router.post("/admin/create")
 async def create_admin(admin_data: AdminCreate, admin = Depends(get_current_admin)):
+    """Create new admin user"""
+    
     # Check if email already exists
-    existing = await db.admin_users.find_one({"email": admin_data.email})
-    if existing:
+    existing_admin = await db.admins.find_one({"email": admin_data.email})
+    if existing_admin:
         raise HTTPException(status_code=400, detail="Email already exists")
     
+    # Create new admin
     new_admin = AdminUser(
-        **admin_data.dict(),
-        password=hash_password(admin_data.password)
+        email=admin_data.email,
+        name=admin_data.name,
+        password=get_password_hash(admin_data.password),
+        is_active=admin_data.is_active
     )
     
-    await db.admin_users.insert_one(new_admin.dict())
+    await db.admins.insert_one(new_admin.dict())
     
-    # Remove password from response
-    admin_dict = new_admin.dict()
-    admin_dict.pop("password")
-    return AdminUser(**admin_dict)
+    # Return admin without password
+    admin_response = new_admin.dict()
+    admin_response.pop("password")
+    
+    return admin_response
 
-# ENHANCED DASHBOARD
-@api_router.get("/dashboard/stats", response_model=DashboardStats)
-async def get_dashboard_stats(admin = Depends(get_current_admin)):
-    # Basic counts
-    total_categories = await db.categories.count_documents({"is_active": True})
-    total_subcategories = await db.subcategories.count_documents({"is_active": True})
-    total_stickers = await db.unified_stickers.count_documents({"is_active": True})
-    
-    # Recent uploads (last 7 days)
-    week_ago = datetime.utcnow() - timedelta(days=7)
-    recent_uploads = await db.unified_stickers.count_documents({
-        "created_date": {"$gte": week_ago}
-    })
-    
-    # Platform-specific stats
-    ios_stickers = await db.unified_stickers.count_documents({
-        "is_active": True,
-        "platforms": "ios"
-    })
-    android_stickers = await db.unified_stickers.count_documents({
-        "is_active": True,
-        "platforms": "android"
-    })
-    
-    # Cross-platform stickers
-    cross_platform = await db.unified_stickers.count_documents({
-        "is_active": True,
-        "platforms": {"$all": ["ios", "android"]}
-    })
-    
-    # Calculate total downloads and views by platform
-    ios_downloads = await db.unified_stickers.aggregate([
-        {"$group": {"_id": None, "total": {"$sum": "$downloads_ios"}}}
-    ]).to_list(1)
-    ios_downloads = ios_downloads[0]["total"] if ios_downloads else 0
-    
-    android_downloads = await db.unified_stickers.aggregate([
-        {"$group": {"_id": None, "total": {"$sum": "$downloads_android"}}}
-    ]).to_list(1)
-    android_downloads = android_downloads[0]["total"] if android_downloads else 0
-    
-    ios_views = await db.unified_stickers.aggregate([
-        {"$group": {"_id": None, "total": {"$sum": "$views_ios"}}}
-    ]).to_list(1)
-    ios_views = ios_views[0]["total"] if ios_views else 0
-    
-    android_views = await db.unified_stickers.aggregate([
-        {"$group": {"_id": None, "total": {"$sum": "$views_android"}}}
-    ]).to_list(1)
-    android_views = android_views[0]["total"] if android_views else 0
-    
-    # Subscription stats (if enabled)
-    total_subscribers = await db.user_subscriptions.count_documents({
-        "status": {"$in": ["active", "trial"]}
-    })
-    
-    active_monthly_subs = await db.user_subscriptions.count_documents({
-        "status": "active",
-        "plan_id": "support_monthly"
-    })
-    active_yearly_subs = await db.user_subscriptions.count_documents({
-        "status": "active", 
-        "plan_id": "support_yearly"
-    })
-    
-    monthly_revenue = (active_monthly_subs * 50.0) + (active_yearly_subs * 400.0 / 12)
-    
-    # Advanced stats
-    total_banners = await db.promo_banners.count_documents({})
-    active_banners = await db.promo_banners.count_documents({"is_active": True})
-    total_notifications_sent = await db.push_notifications.aggregate([
-        {"$group": {"_id": None, "total": {"$sum": "$sent_count"}}}
-    ]).to_list(1)
-    total_notifications_sent = total_notifications_sent[0]["total"] if total_notifications_sent else 0
-    
-    return DashboardStats(
-        total_categories=total_categories,
-        total_subcategories=total_subcategories,
-        total_stickers=total_stickers,
-        recent_uploads=recent_uploads,
-        ios_stats=PlatformStats(
-            total_stickers=ios_stickers,
-            total_downloads=ios_downloads,
-            total_views=ios_views,
-            active_users=0,  # This would come from user analytics
-            avg_stickers_per_user=0.0
-        ),
-        android_stats=PlatformStats(
-            total_stickers=android_stickers,
-            total_downloads=android_downloads,
-            total_views=android_views,
-            active_users=0,
-            avg_stickers_per_user=0.0
-        ),
-        total_subscribers=total_subscribers,
-        monthly_revenue=round(monthly_revenue, 2),
-        active_subscriptions=total_subscribers,
-        total_banners=total_banners,
-        active_banners=active_banners,
-        total_notifications_sent=total_notifications_sent,
-        cross_platform_stickers=cross_platform
-    )
+# ==========================================
+# SYSTEM CONFIGURATION & FIREBASE
+# ==========================================
 
-# UNIFIED STICKERS ROUTES
-@api_router.get("/stickers", response_model=List[UnifiedSticker])
-async def get_stickers(
-    category_id: Optional[str] = None,
-    sub_category_id: Optional[str] = None,
-    platform: Optional[Platform] = None,
-    admin = Depends(get_current_admin)
-):
-    query = {"is_active": True}
-    if category_id:
-        query["category_id"] = category_id
-    if sub_category_id:
-        query["sub_category_id"] = sub_category_id
-    if platform:
-        query["platforms"] = platform.value
-    
-    stickers = await db.unified_stickers.find(query).sort("created_date", -1).to_list(100)
-    return [UnifiedSticker(**sticker) for sticker in stickers]
-
-@api_router.post("/stickers", response_model=StickerUploadResponse)
-async def create_sticker(sticker_data: UnifiedStickerCreate, admin = Depends(get_current_admin)):
-    sticker = UnifiedSticker(**sticker_data.dict())
-    
-    # Calculate estimated file size and bandwidth cost
-    estimated_size = 0.0
-    formats_used = []
-    
-    if sticker.files.png:
-        estimated_size += sticker_data.file_size_mb or 0.5
-        formats_used.append("PNG")
-    if sticker.files.webp:
-        estimated_size += (sticker_data.file_size_mb or 0.5) * 0.7  # WebP is ~30% smaller
-        formats_used.append("WebP")
-    if sticker.files.animated_gif:
-        estimated_size += (sticker_data.file_size_mb or 0.5) * 2  # GIFs are larger
-        formats_used.append("GIF")
-    
-    sticker.file_size_mb = estimated_size
-    
-    await db.unified_stickers.insert_one(sticker.dict())
-    
-    # Update category/subcategory counts
-    if "ios" in sticker.platforms:
-        await db.categories.update_one(
-            {"id": sticker.category_id},
-            {"$inc": {"sticker_count_ios": 1}}
-        )
-        if sticker.sub_category_id:
-            await db.subcategories.update_one(
-                {"id": sticker.sub_category_id},
-                {"$inc": {"sticker_count_ios": 1}}
-            )
-    
-    if "android" in sticker.platforms:
-        await db.categories.update_one(
-            {"id": sticker.category_id},
-            {"$inc": {"sticker_count_android": 1}}
-        )
-        if sticker.sub_category_id:
-            await db.subcategories.update_one(
-                {"id": sticker.sub_category_id},
-                {"$inc": {"sticker_count_android": 1}}
-            )
-    
-    return StickerUploadResponse(
-        sticker=sticker,
-        generated_thumbnails=[],  # Would be populated by actual file processing
-        converted_formats=formats_used,
-        total_size_mb=estimated_size,
-        estimated_bandwidth_cost=estimated_size * 0.001  # $0.001 per MB
-    )
-
-@api_router.put("/stickers/{sticker_id}", response_model=UnifiedSticker)
-async def update_sticker(sticker_id: str, sticker_data: UnifiedStickerCreate, admin = Depends(get_current_admin)):
-    # Get current sticker for platform comparison
-    current_sticker = await db.unified_stickers.find_one({"id": sticker_id})
-    if not current_sticker:
-        raise HTTPException(status_code=404, detail="Sticker not found")
-    
-    update_data = sticker_data.dict()
-    update_data["updated_date"] = datetime.utcnow()
-    
-    # Update platform counts if platforms changed
-    old_platforms = set(current_sticker.get("platforms", []))
-    new_platforms = set(sticker_data.platforms)
-    
-    if old_platforms != new_platforms:
-        # Handle iOS platform changes
-        if "ios" in old_platforms and "ios" not in new_platforms:
-            # Removed from iOS
-            await db.categories.update_one(
-                {"id": current_sticker["category_id"]},
-                {"$inc": {"sticker_count_ios": -1}}
-            )
-            if current_sticker.get("sub_category_id"):
-                await db.subcategories.update_one(
-                    {"id": current_sticker["sub_category_id"]},
-                    {"$inc": {"sticker_count_ios": -1}}
-                )
-        elif "ios" not in old_platforms and "ios" in new_platforms:
-            # Added to iOS
-            await db.categories.update_one(
-                {"id": current_sticker["category_id"]},
-                {"$inc": {"sticker_count_ios": 1}}
-            )
-            if current_sticker.get("sub_category_id"):
-                await db.subcategories.update_one(
-                    {"id": current_sticker["sub_category_id"]},
-                    {"$inc": {"sticker_count_ios": 1}}
-                )
-        
-        # Handle Android platform changes
-        if "android" in old_platforms and "android" not in new_platforms:
-            # Removed from Android
-            await db.categories.update_one(
-                {"id": current_sticker["category_id"]},
-                {"$inc": {"sticker_count_android": -1}}
-            )
-            if current_sticker.get("sub_category_id"):
-                await db.subcategories.update_one(
-                    {"id": current_sticker["sub_category_id"]},
-                    {"$inc": {"sticker_count_android": -1}}
-                )
-        elif "android" not in old_platforms and "android" in new_platforms:
-            # Added to Android
-            await db.categories.update_one(
-                {"id": current_sticker["category_id"]},
-                {"$inc": {"sticker_count_android": 1}}
-            )
-            if current_sticker.get("sub_category_id"):
-                await db.subcategories.update_one(
-                    {"id": current_sticker["sub_category_id"]},
-                    {"$inc": {"sticker_count_android": 1}}
-                )
-    
-    result = await db.unified_stickers.update_one(
-        {"id": sticker_id},
-        {"$set": update_data}
-    )
-    
-    if result.modified_count == 0:
-        raise HTTPException(status_code=404, detail="Sticker not found")
-    
-    updated_sticker = await db.unified_stickers.find_one({"id": sticker_id})
-    return UnifiedSticker(**updated_sticker)
-
-@api_router.delete("/stickers/{sticker_id}")
-async def delete_sticker(sticker_id: str, admin = Depends(get_current_admin)):
-    sticker = await db.unified_stickers.find_one({"id": sticker_id})
-    if not sticker:
-        raise HTTPException(status_code=404, detail="Sticker not found")
-    
-    # Update counts
-    if "ios" in sticker.get("platforms", []):
-        await db.categories.update_one(
-            {"id": sticker["category_id"]},
-            {"$inc": {"sticker_count_ios": -1}}
-        )
-        if sticker.get("sub_category_id"):
-            await db.subcategories.update_one(
-                {"id": sticker["sub_category_id"]},
-                {"$inc": {"sticker_count_ios": -1}}
-            )
-    
-    if "android" in sticker.get("platforms", []):
-        await db.categories.update_one(
-            {"id": sticker["category_id"]},
-            {"$inc": {"sticker_count_android": -1}}
-        )
-        if sticker.get("sub_category_id"):
-            await db.subcategories.update_one(
-                {"id": sticker["sub_category_id"]},
-                {"$inc": {"sticker_count_android": -1}}
-            )
-    
-    result = await db.unified_stickers.update_one(
-        {"id": sticker_id},
-        {"$set": {"is_active": False, "updated_date": datetime.utcnow()}}
-    )
-    
-    return {"message": "Sticker deleted successfully"}
-
-# PUBLIC API for mobile apps (platform-specific responses)
-@api_router.get("/app/stickers/{platform}", response_model=List[PlatformStickerResponse])
-async def get_platform_stickers(
-    platform: Platform,
-    category_id: Optional[str] = None,
-    sub_category_id: Optional[str] = None,
-    limit: int = 50
-):
-    query = {
-        "is_active": True,
-        "platforms": platform.value
-    }
-    
-    if category_id:
-        query["category_id"] = category_id
-    if sub_category_id:
-        query["sub_category_id"] = sub_category_id
-    
-    stickers = await db.unified_stickers.find(query).limit(limit).to_list(limit)
-    
-    # Format response for specific platform
-    platform_stickers = []
-    for sticker in stickers:
-        files = {}
-        sticker_files = sticker.get("files", {})
-        
-        # Include files that work on this platform
-        if sticker_files.get("png"):
-            files["png"] = sticker_files["png"]
-        if sticker_files.get("webp"):
-            files["webp"] = sticker_files["webp"]
-        if sticker_files.get("animated_gif"):
-            files["animated_gif"] = sticker_files["animated_gif"]
-        
-        # Include platform-specific files
-        if platform == Platform.IOS and sticker_files.get("ios_specific"):
-            files["ios_specific"] = sticker_files["ios_specific"]
-        elif platform == Platform.ANDROID and sticker_files.get("android_specific"):
-            files["android_specific"] = sticker_files["android_specific"]
-        
-        platform_stickers.append(PlatformStickerResponse(
-            id=sticker["id"],
-            name=sticker["name"],
-            description=sticker.get("description"),
-            category_id=sticker["category_id"],
-            sub_category_id=sticker.get("sub_category_id"),
-            files=files,
-            is_premium=sticker.get("is_premium", False),
-            file_size_mb=sticker.get("file_size_mb"),
-            dimensions=sticker.get("dimensions")
-        ))
-    
-    return platform_stickers
-
-# SYSTEM CONFIGURATION WITH FIREBASE
-@api_router.get("/system/config", response_model=SystemSettings)
+@api_router.get("/system/config")
 async def get_system_config(admin = Depends(get_current_admin)):
-    config = await db.system_settings.find_one()
-    if not config:
-        # Create default config
-        default_config = SystemSettings()
-        await db.system_settings.insert_one(default_config.dict())
-        return default_config
-    return SystemSettings(**config)
-
-@api_router.put("/system/config", response_model=SystemSettings)
-async def update_system_config(config_data: SystemSettings, admin = Depends(get_current_admin)):
-    config_data.updated_date = datetime.utcnow()
+    """Get system configuration"""
     
-    await db.system_settings.update_one(
-        {},
-        {"$set": config_data.dict()},
-        upsert=True
+    config = await db.system_config.find_one({})
+    
+    if not config:
+        # Create default configuration
+        default_config = DEFAULT_SYSTEM_CONFIG.copy()
+        default_config["id"] = str(uuid.uuid4())
+        default_config["created_date"] = datetime.utcnow()
+        default_config["updated_date"] = datetime.utcnow()
+        
+        await db.system_config.insert_one(default_config)
+        return default_config
+    
+    return config
+
+@api_router.put("/system/config")
+async def update_system_config(config_update: dict, admin = Depends(get_current_admin)):
+    """Update system configuration"""
+    
+    existing_config = await db.system_config.find_one({})
+    
+    if not existing_config:
+        raise HTTPException(status_code=404, detail="System configuration not found")
+    
+    # Update configuration
+    config_update["updated_date"] = datetime.utcnow()
+    
+    await db.system_config.update_one(
+        {"id": existing_config["id"]},
+        {"$set": config_update}
     )
     
-    return config_data
+    updated_config = await db.system_config.find_one({"id": existing_config["id"]})
+    return updated_config
 
 @api_router.get("/system/firebase-instructions")
 async def get_firebase_instructions(admin = Depends(get_current_admin)):
+    """Get Firebase setup instructions"""
     return {"instructions": DEFAULT_FIREBASE_INSTRUCTIONS}
 
 @api_router.post("/system/test-firebase")
 async def test_firebase_config(admin = Depends(get_current_admin)):
-    config = await db.system_settings.find_one()
+    """Test Firebase configuration"""
+    
+    config = await db.system_config.find_one({})
     if not config or not config.get("firebase_config"):
         raise HTTPException(status_code=400, detail="Firebase not configured")
     
@@ -645,69 +1039,18 @@ async def test_firebase_config(admin = Depends(get_current_admin)):
         issues.append("iOS Team ID missing")
     
     if issues:
-        return {"status": "error", "issues": issues}
+        return {"status": "warning", "message": "Configuration incomplete", "issues": issues}
     
     # In a real implementation, you would test actual Firebase connection here
     return {"status": "success", "message": "Firebase configuration appears valid"}
 
-# Keep existing routes for categories, subscriptions, banners, notifications, etc.
-# (Adding abbreviated versions to save space - the full implementation would include all previous routes)
-
-@api_router.get("/categories", response_model=List[Category])
-async def get_categories(platform: Optional[Platform] = None, admin = Depends(get_current_admin)):
-    query = {"is_active": True}
-    if platform:
-        query["platforms"] = platform
-    
-    categories = await db.categories.find(query).sort("created_date", -1).to_list(100)
-    return [Category(**cat) for cat in categories]
-
-@api_router.post("/categories", response_model=Category)
-async def create_category(category_data: CategoryCreate, admin = Depends(get_current_admin)):
-    category = Category(**category_data.dict())
-    await db.categories.insert_one(category.dict())
-    return category
-
-# Initialize default admin (updated to use new collection)
-@api_router.post("/init-admin")
-async def initialize_admin():
-    existing_admin = await db.admin_users.find_one()
-    if existing_admin:
-        return {"message": "Admin already exists"}
-    
-    admin = AdminUser(
-        email="admin@stickers.com",
-        name="Admin",
-        password=hash_password("admin123")
-    )
-    
-    await db.admin_users.insert_one(admin.dict())
-    return {"message": "Default admin created", "email": "admin@stickers.com", "password": "admin123"}
-
-# Include all existing routes from the previous implementation
-# (Subscription routes, banner routes, notification routes, etc.)
-
-# Include the router in the main app
+# Mount the API router
 app.include_router(api_router)
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_credentials=True,
-    allow_origins=os.environ.get('CORS_ORIGINS', '*').split(','),
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
-logger = logging.getLogger(__name__)
-
-@app.on_event("shutdown")
-async def shutdown_db_client():
-    client.close()
+# Health check endpoint
+@app.get("/health")
+async def health_check():
+    return {"status": "healthy", "timestamp": datetime.utcnow().isoformat()}
 
 if __name__ == "__main__":
     import uvicorn
