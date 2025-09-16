@@ -13,6 +13,7 @@ import Categories from './components/Categories';
 import SubCategories from './components/SubCategories';
 import Stickers from './components/Stickers';
 import Settings from './components/Settings';
+import Subscriptions from './components/Subscriptions';
 import Layout from './components/Layout';
 import { Toaster } from 'sonner';
 
@@ -90,6 +91,13 @@ function AppContent() {
           <ProtectedRoute>
             <Layout>
               <Stickers />
+            </Layout>
+          </ProtectedRoute>
+        } />
+        <Route path="/subscriptions" element={
+          <ProtectedRoute>
+            <Layout>
+              <Subscriptions />
             </Layout>
           </ProtectedRoute>
         } />

@@ -11,7 +11,9 @@ import {
   Menu, 
   X,
   Smartphone,
-  Monitor
+  Monitor,
+  Crown,
+  Heart
 } from 'lucide-react';
 
 export default function Layout({ children }) {
@@ -24,6 +26,7 @@ export default function Layout({ children }) {
     { name: 'Categorías', href: '/categories', icon: FolderOpen },
     { name: 'Subcategorías', href: '/subcategories', icon: Layers },
     { name: 'Stickers', href: '/stickers', icon: Sticker },
+    { name: 'Suscripciones', href: '/subscriptions', icon: Crown, badge: 'Premium' },
     { name: 'Configuración', href: '/settings', icon: Settings },
   ];
 
@@ -119,11 +122,27 @@ function SidebarContent({ navigation, location, admin, onLogout }) {
                     isActive ? 'text-blue-500' : 'text-gray-400 group-hover:text-gray-500'
                   }`}
                 />
-                {item.name}
+                <span className="flex-1">{item.name}</span>
+                {item.badge && (
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-pink-100 text-pink-800">
+                    {item.badge}
+                  </span>
+                )}
               </Link>
             );
           })}
         </nav>
+
+        {/* Support Creator Section */}
+        <div className="px-4 py-3 mb-4 mx-2 bg-gradient-to-r from-pink-50 to-rose-50 rounded-lg border border-pink-200">
+          <div className="flex items-center gap-2 mb-2">
+            <Heart className="h-4 w-4 text-pink-600" />
+            <span className="text-sm font-medium text-pink-900">Apoyo al Creador</span>
+          </div>
+          <p className="text-xs text-pink-700">
+            Las suscripciones ayudan directamente al creador de estos increíbles stickers
+          </p>
+        </div>
       </div>
 
       {/* User info */}
