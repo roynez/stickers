@@ -133,6 +133,13 @@ function AppContent() {
             </Layout>
           </ProtectedRoute>
         } />
+        <Route path="/admin-profile" element={
+          <ProtectedRoute>
+            <Layout>
+              <AdminProfile />
+            </Layout>
+          </ProtectedRoute>
+        } />
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </div>
