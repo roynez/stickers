@@ -311,9 +311,10 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Package-based System Implementation"
-    - "New Navigation System"
-    - "Dashboard Stats with Package Metrics"
+    - "File Upload Endpoints"
+    - "Horizontal Banners System"
+    - "Categories with Thumbnails"
+    - "Banner Analytics"
   stuck_tasks:
     - "System Configuration API"
   test_all: false
