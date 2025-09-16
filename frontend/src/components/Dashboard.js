@@ -2,12 +2,17 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { 
   FolderOpen, 
-  Layers, 
-  Sticker, 
+  Package, 
   TrendingUp, 
   Smartphone, 
   Monitor,
-  Upload,
+  Heart,
+  Download,
+  Star,
+  Fire,
+  Sparkles,
+  BarChart3,
+  Users,
   Activity
 } from 'lucide-react';
 
