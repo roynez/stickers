@@ -1097,8 +1097,10 @@ class BackendTester:
             banner_data = {
                 "title": "Test Banner for Image Upload",
                 "description": "Testing image upload functionality",
-                "action_type": "url",
-                "action_value": "https://example.com",
+                "action": {
+                    "type": "external_link",
+                    "value": "https://example.com"
+                },
                 "is_active": False,
                 "priority": 1
             }
