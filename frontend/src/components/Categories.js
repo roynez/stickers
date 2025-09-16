@@ -157,6 +157,7 @@ export default function Categories() {
   const closeModal = () => {
     setShowModal(false);
     setEditingCategory(null);
+    setSelectedFile(null);
     setFormData({
       name: '',
       image: '',
