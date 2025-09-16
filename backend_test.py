@@ -740,7 +740,7 @@ class BackendTester:
             return False
     
     def test_dashboard_stats(self):
-        """Test dashboard stats endpoint"""
+        """Test dashboard stats endpoint with package-based metrics"""
         if not self.auth_token:
             self.log_test("Dashboard Stats", False, "No auth token available")
             return False
@@ -750,7 +750,7 @@ class BackendTester:
             
             if response.status_code == 200:
                 data = response.json()
-                required_fields = ["total_categories", "total_subcategories", "total_stickers", "recent_uploads"]
+                required_fields = ["total_packages", "total_categories", "total_downloads", "total_likes"]
                 
                 missing_fields = [field for field in required_fields if field not in data]
                 
@@ -758,14 +758,25 @@ class BackendTester:
                     self.log_test(
                         "Dashboard Stats", 
                         True, 
-                        f"Retrieved dashboard stats: {data.get('total_stickers', 0)} stickers, {data.get('total_categories', 0)} categories"
+                        f"Retrieved package-based dashboard stats: {data.get('total_packages', 0)} packages, {data.get('total_categories', 0)} categories, {data.get('total_downloads', 0)} downloads"
                     )
+                    
+                    # Test popular packages endpoint
+                    popular_response = self.session.get(f"{BACKEND_URL}/dashboard/popular-packages?limit=5")
+                    if popular_response.status_code == 200:
+                        popular_data = popular_response.json()
+                        self.log_test(
+                            "Popular Packages", 
+                            True, 
+                            f"Retrieved {len(popular_data)} popular packages"
+                        )
+                    
                     return True
                 else:
                     self.log_test(
                         "Dashboard Stats", 
                         False, 
-                        f"Missing required fields: {missing_fields}"
+                        f"Missing required package-based fields: {missing_fields}"
                     )
                     return False
             else:
@@ -779,6 +790,36 @@ class BackendTester:
                 
         except Exception as e:
             self.log_test("Dashboard Stats", False, f"Exception: {str(e)}")
+            return False
+
+    def test_packages_delete(self):
+        """Test deleting a package (cleanup)"""
+        if not self.auth_token or not self.test_package_id:
+            self.log_test("Packages DELETE", False, "No auth token or package ID available")
+            return False
+            
+        try:
+            response = self.session.delete(f"{BACKEND_URL}/packages/{self.test_package_id}")
+            
+            if response.status_code == 200:
+                data = response.json()
+                self.log_test(
+                    "Packages DELETE", 
+                    True, 
+                    f"Package deleted successfully: {data.get('message')}"
+                )
+                return True
+            else:
+                self.log_test(
+                    "Packages DELETE", 
+                    False, 
+                    f"Failed with status {response.status_code}",
+                    {"response": response.text}
+                )
+                return False
+                
+        except Exception as e:
+            self.log_test("Packages DELETE", False, f"Exception: {str(e)}")
             return False
     
     def run_all_tests(self):
