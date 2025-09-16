@@ -15,6 +15,13 @@ import jwt
 from enum import Enum
 import shutil
 
+# Import subscription models
+from subscription_models import (
+    SubscriptionPlan, SubscriptionPlanCreate, UserSubscription, UserSubscriptionCreate,
+    SubscriptionStats, SubscriptionCheck, SubscriptionStatus, SubscriptionPlatform,
+    PlanDuration, DEFAULT_PLANS, SUBSCRIPTION_FEATURES
+)
+
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
@@ -29,7 +36,7 @@ ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 1440  # 24 hours
 
 # Create the main app
-app = FastAPI(title="Unified Sticker Admin Panel", version="1.0.0")
+app = FastAPI(title="Unified Sticker Admin Panel with Subscriptions", version="2.0.0")
 
 # Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
@@ -47,7 +54,7 @@ class StickerType(str, Enum):
     PNG = "png"
     WEBP = "webp"
 
-# Models
+# Existing Models (keeping all the original models)
 class AdminLogin(BaseModel):
     email: str
     password: str
@@ -64,6 +71,7 @@ class Category(BaseModel):
     image: Optional[str] = None
     platforms: List[Platform] = [Platform.IOS, Platform.ANDROID]
     is_active: bool = True
+    is_premium: bool = False  # New field for premium categories
     created_date: datetime = Field(default_factory=datetime.utcnow)
     updated_date: datetime = Field(default_factory=datetime.utcnow)
 
@@ -72,6 +80,7 @@ class CategoryCreate(BaseModel):
     image: Optional[str] = None
     platforms: List[Platform] = [Platform.IOS, Platform.ANDROID]
     is_active: bool = True
+    is_premium: bool = False
 
 class SubCategory(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
@@ -80,6 +89,7 @@ class SubCategory(BaseModel):
     image: Optional[str] = None
     platforms: List[Platform] = [Platform.IOS, Platform.ANDROID]
     is_active: bool = True
+    is_premium: bool = False  # New field for premium subcategories
     created_date: datetime = Field(default_factory=datetime.utcnow)
     updated_date: datetime = Field(default_factory=datetime.utcnow)
 
@@ -89,6 +99,7 @@ class SubCategoryCreate(BaseModel):
     image: Optional[str] = None
     platforms: List[Platform] = [Platform.IOS, Platform.ANDROID]
     is_active: bool = True
+    is_premium: bool = False
 
 class StickerFile(BaseModel):
     animated: Optional[str] = None  # For iOS
@@ -106,6 +117,7 @@ class Sticker(BaseModel):
     name: str
     platforms: StickerPlatforms
     is_active: bool = True
+    is_premium: bool = False  # New field for premium stickers
     created_date: datetime = Field(default_factory=datetime.utcnow)
     updated_date: datetime = Field(default_factory=datetime.utcnow)
 
@@ -115,40 +127,41 @@ class StickerCreate(BaseModel):
     name: str
     platforms: StickerPlatforms
     is_active: bool = True
+    is_premium: bool = False
 
-# Enhanced Ad Configuration Models
+# Enhanced Ad Configuration Models (keeping existing)
 class AdMobConfig(BaseModel):
-    banner: Optional[str] = None              # Banner ads
-    interstitial: Optional[str] = None        # Interstitial ads
-    rewarded_interstitial: Optional[str] = None  # Rewarded interstitial (BETA)
-    rewarded: Optional[str] = None            # Rewarded video ads
-    native_advanced: Optional[str] = None     # Native advanced ads
-    app_open: Optional[str] = None            # App open ads
+    banner: Optional[str] = None
+    interstitial: Optional[str] = None
+    rewarded_interstitial: Optional[str] = None
+    rewarded: Optional[str] = None
+    native_advanced: Optional[str] = None
+    app_open: Optional[str] = None
 
 class FacebookAdsConfig(BaseModel):
-    banner: Optional[str] = None              # Banner placement
-    interstitial: Optional[str] = None        # Interstitial placement
-    rewarded_video: Optional[str] = None      # Rewarded video placement
-    native: Optional[str] = None              # Native ads placement
+    banner: Optional[str] = None
+    interstitial: Optional[str] = None
+    rewarded_video: Optional[str] = None
+    native: Optional[str] = None
 
 class UnityAdsConfig(BaseModel):
-    game_id: Optional[str] = None             # Unity Game ID
-    banner: Optional[str] = None              # Banner placement
-    interstitial: Optional[str] = None        # Interstitial placement
-    rewarded_video: Optional[str] = None      # Rewarded video placement
+    game_id: Optional[str] = None
+    banner: Optional[str] = None
+    interstitial: Optional[str] = None
+    rewarded_video: Optional[str] = None
 
 class IronSourceConfig(BaseModel):
-    app_key: Optional[str] = None             # IronSource App Key
-    banner: Optional[str] = None              # Banner instance
-    interstitial: Optional[str] = None        # Interstitial instance
-    rewarded_video: Optional[str] = None      # Rewarded video instance
+    app_key: Optional[str] = None
+    banner: Optional[str] = None
+    interstitial: Optional[str] = None
+    rewarded_video: Optional[str] = None
 
 class AppLovinConfig(BaseModel):
-    sdk_key: Optional[str] = None             # AppLovin SDK Key
-    banner: Optional[str] = None              # Banner ad unit
-    interstitial: Optional[str] = None        # Interstitial ad unit
-    rewarded: Optional[str] = None            # Rewarded ad unit
-    native: Optional[str] = None              # Native ad unit
+    sdk_key: Optional[str] = None
+    banner: Optional[str] = None
+    interstitial: Optional[str] = None
+    rewarded: Optional[str] = None
+    native: Optional[str] = None
 
 class AdConfig(BaseModel):
     admob: Optional[AdMobConfig] = AdMobConfig()
@@ -158,11 +171,12 @@ class AdConfig(BaseModel):
     applovin: Optional[AppLovinConfig] = AppLovinConfig()
 
 class MonetizationSettings(BaseModel):
-    ad_frequency: int = 3                     # Show ad every X sticker views
-    reward_amount: int = 10                   # Coins/points for watching rewarded ads
-    banner_refresh_rate: int = 30             # Banner refresh in seconds
-    interstitial_min_interval: int = 60       # Minimum seconds between interstitials
-    enable_test_ads: bool = False             # Show test ads in development
+    ad_frequency: int = 3
+    reward_amount: int = 10
+    banner_refresh_rate: int = 30
+    interstitial_min_interval: int = 60
+    enable_test_ads: bool = False
+    subscription_removes_ads: bool = True  # New field
 
 class AppSettings(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
@@ -183,8 +197,12 @@ class DashboardStats(BaseModel):
     total_stickers_android: int
     total_stickers: int
     recent_uploads: int
+    # New subscription stats
+    total_subscribers: int
+    monthly_revenue: float
+    active_subscriptions: int
 
-# Helper Functions
+# Helper Functions (keeping existing)
 def hash_password(password: str) -> str:
     return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
 
@@ -212,7 +230,7 @@ async def get_current_admin(credentials: HTTPAuthorizationCredentials = Depends(
     except jwt.PyJWTError:
         raise HTTPException(status_code=401, detail="Invalid token")
 
-# Routes
+# Existing Routes (Auth and Dashboard)
 @api_router.post("/auth/login", response_model=AdminResponse)
 async def login(admin_data: AdminLogin):
     admin = await db.admins.find_one({"email": admin_data.email})
@@ -249,16 +267,199 @@ async def get_dashboard_stats(admin = Depends(get_current_admin)):
         "created_date": {"$gte": week_ago}
     })
     
+    # Subscription stats
+    total_subscribers = await db.user_subscriptions.count_documents({
+        "status": {"$in": ["active", "trial"]}
+    })
+    
+    # Calculate monthly revenue (active subscriptions)
+    active_monthly_subs = await db.user_subscriptions.count_documents({
+        "status": "active",
+        "plan_id": "support_monthly"
+    })
+    active_yearly_subs = await db.user_subscriptions.count_documents({
+        "status": "active", 
+        "plan_id": "support_yearly"
+    })
+    
+    monthly_revenue = (active_monthly_subs * 50.0) + (active_yearly_subs * 400.0 / 12)
+    
     return DashboardStats(
         total_categories=total_categories,
         total_subcategories=total_subcategories,
         total_stickers_ios=ios_stickers,
         total_stickers_android=android_stickers,
         total_stickers=total_stickers,
-        recent_uploads=recent_uploads
+        recent_uploads=recent_uploads,
+        total_subscribers=total_subscribers,
+        monthly_revenue=round(monthly_revenue, 2),
+        active_subscriptions=total_subscribers
     )
 
-# Categories
+# SUBSCRIPTION ROUTES
+@api_router.get("/subscriptions/plans", response_model=List[SubscriptionPlan])
+async def get_subscription_plans(admin = Depends(get_current_admin)):
+    plans = await db.subscription_plans.find({"is_active": True}).sort("price_mxn", 1).to_list(100)
+    return [SubscriptionPlan(**plan) for plan in plans]
+
+@api_router.post("/subscriptions/plans", response_model=SubscriptionPlan)
+async def create_subscription_plan(plan_data: SubscriptionPlanCreate, admin = Depends(get_current_admin)):
+    plan = SubscriptionPlan(**plan_data.dict())
+    await db.subscription_plans.insert_one(plan.dict())
+    return plan
+
+@api_router.put("/subscriptions/plans/{plan_id}", response_model=SubscriptionPlan)
+async def update_subscription_plan(plan_id: str, plan_data: SubscriptionPlanCreate, admin = Depends(get_current_admin)):
+    update_data = plan_data.dict()
+    update_data["updated_date"] = datetime.utcnow()
+    
+    result = await db.subscription_plans.update_one(
+        {"id": plan_id},
+        {"$set": update_data}
+    )
+    
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Plan not found")
+    
+    updated_plan = await db.subscription_plans.find_one({"id": plan_id})
+    return SubscriptionPlan(**updated_plan)
+
+@api_router.get("/subscriptions/stats", response_model=SubscriptionStats)
+async def get_subscription_stats(admin = Depends(get_current_admin)):
+    # Total active subscribers
+    total_active = await db.user_subscriptions.count_documents({
+        "status": {"$in": ["active", "trial"]}
+    })
+    
+    # Monthly subscribers
+    monthly_subs = await db.user_subscriptions.count_documents({
+        "status": "active",
+        "plan_id": "support_monthly"
+    })
+    
+    # Yearly subscribers
+    yearly_subs = await db.user_subscriptions.count_documents({
+        "status": "active",
+        "plan_id": "support_yearly"
+    })
+    
+    # Revenue calculations
+    monthly_revenue = monthly_subs * 50.0
+    yearly_revenue = yearly_subs * 400.0
+    total_revenue = monthly_revenue + yearly_revenue
+    
+    # Simple conversion rate (this would need more complex logic in production)
+    total_users = await db.user_subscriptions.distinct("user_id")
+    conversion_rate = (total_active / max(len(total_users), 1)) * 100 if total_users else 0
+    
+    # Churn rate (simplified - expired in last month vs total)
+    month_ago = datetime.utcnow() - timedelta(days=30)
+    expired_last_month = await db.user_subscriptions.count_documents({
+        "status": "expired",
+        "updated_date": {"$gte": month_ago}
+    })
+    churn_rate = (expired_last_month / max(total_active, 1)) * 100 if total_active > 0 else 0
+    
+    # ARPU (Average Revenue Per User)
+    arpu = total_revenue / max(total_active, 1) if total_active > 0 else 0
+    
+    return SubscriptionStats(
+        total_active_subscribers=total_active,
+        monthly_subscribers=monthly_subs,
+        yearly_subscribers=yearly_subs,
+        monthly_revenue=monthly_revenue,
+        yearly_revenue=yearly_revenue,
+        total_revenue=total_revenue,
+        conversion_rate=round(conversion_rate, 2),
+        churn_rate=round(churn_rate, 2),
+        avg_revenue_per_user=round(arpu, 2)
+    )
+
+@api_router.get("/subscriptions/users")
+async def get_subscription_users(
+    limit: int = 50,
+    offset: int = 0,
+    status: Optional[SubscriptionStatus] = None,
+    admin = Depends(get_current_admin)
+):
+    query = {}
+    if status:
+        query["status"] = status
+    
+    subscriptions = await db.user_subscriptions.find(query)\
+        .sort("created_date", -1)\
+        .skip(offset)\
+        .limit(limit)\
+        .to_list(limit)
+    
+    return [UserSubscription(**sub) for sub in subscriptions]
+
+@api_router.post("/subscriptions/users", response_model=UserSubscription)
+async def create_user_subscription(subscription_data: UserSubscriptionCreate, admin = Depends(get_current_admin)):
+    # Get the plan to calculate expiration date
+    plan = await db.subscription_plans.find_one({"id": subscription_data.plan_id})
+    if not plan:
+        raise HTTPException(status_code=404, detail="Subscription plan not found")
+    
+    # Calculate expiration date
+    start_date = datetime.utcnow()
+    if plan["duration"] == "monthly":
+        expires_at = start_date + timedelta(days=30)
+    else:  # yearly
+        expires_at = start_date + timedelta(days=365)
+    
+    subscription = UserSubscription(
+        **subscription_data.dict(),
+        status=SubscriptionStatus.ACTIVE,
+        start_date=start_date,
+        expires_at=expires_at
+    )
+    
+    await db.user_subscriptions.insert_one(subscription.dict())
+    return subscription
+
+# Public API for mobile apps to check subscription status
+@api_router.get("/subscriptions/check/{user_id}", response_model=SubscriptionCheck)
+async def check_user_subscription(user_id: str):
+    # Find active subscription
+    subscription = await db.user_subscriptions.find_one({
+        "user_id": user_id,
+        "status": {"$in": ["active", "trial"]},
+        "expires_at": {"$gt": datetime.utcnow()}
+    })
+    
+    if not subscription:
+        return SubscriptionCheck(
+            user_id=user_id,
+            has_active_subscription=False
+        )
+    
+    # Get plan details
+    plan = await db.subscription_plans.find_one({"id": subscription["plan_id"]})
+    
+    return SubscriptionCheck(
+        user_id=user_id,
+        has_active_subscription=True,
+        subscription_type=plan["name"] if plan else "Unknown",
+        expires_at=subscription["expires_at"],
+        features=plan["features"] if plan else []
+    )
+
+# Initialize default subscription plans
+@api_router.post("/subscriptions/init-plans")
+async def initialize_subscription_plans(admin = Depends(get_current_admin)):
+    existing_plans = await db.subscription_plans.count_documents()
+    if existing_plans > 0:
+        return {"message": "Plans already exist"}
+    
+    for plan_data in DEFAULT_PLANS:
+        plan_data["created_date"] = datetime.utcnow()
+        plan_data["updated_date"] = datetime.utcnow()
+        await db.subscription_plans.insert_one(plan_data)
+    
+    return {"message": "Default subscription plans created", "count": len(DEFAULT_PLANS)}
+
+# Categories (updated with premium support)
 @api_router.get("/categories", response_model=List[Category])
 async def get_categories(platform: Optional[Platform] = None, admin = Depends(get_current_admin)):
     query = {"is_active": True}
@@ -302,7 +503,7 @@ async def delete_category(category_id: str, admin = Depends(get_current_admin)):
     
     return {"message": "Category deleted successfully"}
 
-# Subcategories
+# Subcategories (keeping existing with premium support)
 @api_router.get("/subcategories", response_model=List[SubCategory])
 async def get_subcategories(category_id: Optional[str] = None, platform: Optional[Platform] = None, admin = Depends(get_current_admin)):
     query = {"is_active": True}
@@ -320,7 +521,7 @@ async def create_subcategory(subcategory_data: SubCategoryCreate, admin = Depend
     await db.subcategories.insert_one(subcategory.dict())
     return subcategory
 
-# Stickers
+# Stickers (keeping existing with premium support)
 @api_router.get("/stickers", response_model=List[Sticker])
 async def get_stickers(
     category_id: Optional[str] = None,
@@ -345,7 +546,7 @@ async def create_sticker(sticker_data: StickerCreate, admin = Depends(get_curren
     await db.stickers.insert_one(sticker.dict())
     return sticker
 
-# App Settings
+# App Settings (keeping existing)
 @api_router.get("/settings", response_model=AppSettings)
 async def get_app_settings(admin = Depends(get_current_admin)):
     settings = await db.settings.find_one()
