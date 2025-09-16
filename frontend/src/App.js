@@ -10,7 +10,6 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import Login from './components/Login';
 import Dashboard from './components/Dashboard';
 import Categories from './components/Categories';
-import SubCategories from './components/SubCategories';
 import PackageManager from './components/PackageManager';
 import AdminProfile from './components/AdminProfile';
 import SocialMediaSettings from './components/SocialMediaSettings';
