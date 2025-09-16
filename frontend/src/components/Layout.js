@@ -35,6 +35,7 @@ export default function Layout({ children }) {
     { name: 'Notificaciones', href: '/notifications', icon: Bell, badge: 'Push' },
     { name: 'Sistema', href: '/system-config', icon: Cog, badge: 'Config' },
     { name: 'Configuración', href: '/settings', icon: Settings },
+    { name: 'Perfil Admin', href: '/admin-profile', icon: User, badge: 'Admin' },
   ];
 
   const handleLogout = () => {
