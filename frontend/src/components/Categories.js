@@ -21,11 +21,13 @@ export default function Categories() {
   const [searchTerm, setSearchTerm] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [editingCategory, setEditingCategory] = useState(null);
+  const [uploadConfig, setUploadConfig] = useState(null);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [uploading, setUploading] = useState(false);
+  
   const [formData, setFormData] = useState({
     name: '',
-    image: '',
-    platforms: [],
-    is_active: true
+    description: ''
   });
 
   useEffect(() => {
