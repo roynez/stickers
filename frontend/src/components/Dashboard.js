@@ -77,33 +77,41 @@ export default function Dashboard() {
       title: 'Total Categorías',
       value: stats?.total_categories || 0,
       icon: FolderOpen,
-      color: 'bg-blue-500',
-      bgColor: 'bg-blue-50',
-      textColor: 'text-blue-600'
-    },
-    {
-      title: 'Subcategorías',
-      value: stats?.total_subcategories || 0,
-      icon: Layers,
-      color: 'bg-purple-500',
+      color: 'text-purple-600',
       bgColor: 'bg-purple-50',
-      textColor: 'text-purple-600'
+      change: 'Sin subcategorías'
     },
     {
-      title: 'Total Stickers',
-      value: stats?.total_stickers || 0,
-      icon: Sticker,
-      color: 'bg-green-500',
+      title: 'Total Likes',
+      value: stats?.total_likes || 0,
+      icon: Heart,
+      color: 'text-red-600',
+      bgColor: 'bg-red-50',
+      change: 'Engagement activo'
+    },
+    {
+      title: 'Descargas iOS',
+      value: stats?.total_downloads_ios || 0,
+      icon: Smartphone,
+      color: 'text-blue-600',
+      bgColor: 'bg-blue-50',
+      change: `${stats?.ios_packages || 0} paquetes`
+    },
+    {
+      title: 'Descargas Android',
+      value: stats?.total_downloads_android || 0,
+      icon: Monitor,
+      color: 'text-green-600',
       bgColor: 'bg-green-50',
-      textColor: 'text-green-600'
+      change: `${stats?.android_packages || 0} paquetes`
     },
     {
-      title: 'Subidas Recientes',
-      value: stats?.recent_uploads || 0,
-      icon: Upload,
-      color: 'bg-orange-500',
-      bgColor: 'bg-orange-50',
-      textColor: 'text-orange-600'
+      title: 'Multiplataforma',
+      value: stats?.cross_platform_packages || 0,
+      icon: Activity,
+      color: 'text-purple-600',
+      bgColor: 'bg-purple-50',
+      change: 'iOS + Android'
     }
   ];
 
