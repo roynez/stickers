@@ -166,13 +166,7 @@ export default function Categories() {
     });
   };
 
-  const togglePlatform = (platform) => {
-    const updatedPlatforms = formData.platforms.includes(platform)
-      ? formData.platforms.filter(p => p !== platform)
-      : [...formData.platforms, platform];
-    
-    setFormData({ ...formData, platforms: updatedPlatforms });
-  };
+  // Remove platform toggle - no longer needed
 
   const filteredCategories = categories.filter(category =>
     category.name.toLowerCase().includes(searchTerm.toLowerCase())
