@@ -54,18 +54,71 @@ export default function Categories() {
     e.preventDefault();
     
     try {
+      let category;
       if (editingCategory) {
-        await axios.put(`/categories/${editingCategory.id}`, formData);
+        const response = await axios.put(`/categories/${editingCategory.id}`, formData);
+        category = response.data;
         toast.success('Categoría actualizada correctamente');
       } else {
-        await axios.post('/categories', formData);
+        const response = await axios.post('/categories', formData);
+        category = response.data;
         toast.success('Categoría creada correctamente');
       }
+
+      // Upload thumbnail if selected
+      if (selectedFile) {
+        await uploadThumbnailToCategory(category.id);
+      }
       
-      fetchCategories();
+      fetchData();
       closeModal();
     } catch (error) {
-      toast.error(error.response?.data?.detail || 'Error al guardar categoría');
+      toast.error('Error al guardar categoría');
+    }
+  };
+
+  const uploadThumbnailToCategory = async (categoryId) => {
+    if (!selectedFile) return;
+
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', selectedFile);
+
+      await axios.post(`/categories/${categoryId}/upload-thumbnail`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      toast.success('Miniatura subida correctamente');
+      setSelectedFile(null);
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Error al subir miniatura');
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleFileSelect = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Validate file size
+      const maxSizeMB = uploadConfig?.category_thumbnails?.max_file_size_mb || 0.5;
+      if (file.size > maxSizeMB * 1024 * 1024) {
+        toast.error(`El archivo es muy grande. Máximo ${maxSizeMB}MB`);
+        return;
+      }
+
+      // Validate file type
+      const supportedFormats = uploadConfig?.category_thumbnails?.supported_formats || ['PNG', 'JPG', 'JPEG', 'WebP'];
+      const fileExtension = file.name.split('.').pop().toUpperCase();
+      if (!supportedFormats.includes(fileExtension)) {
+        toast.error(`Formato no soportado. Use: ${supportedFormats.join(', ')}`);
+        return;
+      }
+
+      setSelectedFile(file);
     }
   };
 
