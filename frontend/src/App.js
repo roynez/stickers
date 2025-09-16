@@ -94,7 +94,7 @@ function AppContent() {
         <Route path="/stickers" element={
           <ProtectedRoute>
             <Layout>
-              <Stickers />
+              <UnifiedStickers />
             </Layout>
           </ProtectedRoute>
         } />
