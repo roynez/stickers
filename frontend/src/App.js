@@ -91,10 +91,10 @@ function AppContent() {
             </Layout>
           </ProtectedRoute>
         } />
-        <Route path="/stickers" element={
+        <Route path="/packages" element={
           <ProtectedRoute>
             <Layout>
-              <UnifiedStickers />
+              <PackageManager />
             </Layout>
           </ProtectedRoute>
         } />
