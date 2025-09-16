@@ -12,7 +12,9 @@ import {
   Eye,
   EyeOff,
   Info,
-  Package
+  Package,
+  Smartphone,
+  Monitor
 } from 'lucide-react';
 
 export default function Categories() {
