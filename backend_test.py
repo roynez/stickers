@@ -1009,8 +1009,10 @@ class BackendTester:
             banner_data = {
                 "title": "Test Marketing Banner",
                 "description": "A test banner for promotional content",
-                "action_type": "url",
-                "action_value": "https://example.com/promo",
+                "action": {
+                    "type": "external_link",
+                    "value": "https://example.com/promo"
+                },
                 "is_active": True,
                 "priority": 1,
                 "start_date": None,
