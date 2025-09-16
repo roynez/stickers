@@ -7,10 +7,12 @@ import {
   Trash2, 
   Search, 
   FolderOpen,
-  Smartphone,
-  Monitor,
+  Upload,
+  Image as ImageIcon,
   Eye,
-  EyeOff
+  EyeOff,
+  Info,
+  Package
 } from 'lucide-react';
 
 export default function Categories() {
