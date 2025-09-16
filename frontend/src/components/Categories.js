@@ -127,7 +127,7 @@ export default function Categories() {
       try {
         await axios.delete(`/categories/${categoryId}`);
         toast.success('Categoría eliminada correctamente');
-        fetchCategories();
+        fetchData();
       } catch (error) {
         toast.error('Error al eliminar categoría');
       }
