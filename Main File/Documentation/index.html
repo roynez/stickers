@@ -1,0 +1,759 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<title>Documentation</title>
+    
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta charset="utf-8">
+		
+	<!-- Minified Bootstrap CSS -->
+	<link rel="stylesheet" type="text/css" href="css/bootstrap.min.css" />	
+	<!-- Minified Font Awesome CSS -->
+	<link rel="stylesheet" href="css/font-awesome.min.css">
+	<!-- Custom CSS -->
+	<link rel="stylesheet" type="text/css" href="css/style.css" />
+
+</head>
+<body>
+
+	<!-- Side navigation -->
+	<div class="sidenav">
+		<a id="00" href="#introduction">Introduction</a>
+		<hr>
+		<a id="01" href="#components">Components</a>
+		<hr>
+		<a id="02" href="#admin-requirements" >Admin Setup</a>
+		<div class="sub-menu">
+			<a id="03" href="#admin-requirements">Requirements</a>
+			<hr>
+			<a id="04" href="#admin-configuration">Configuration</a>
+			<hr>
+		</div>
+
+		<a id="03" href="#api-configuration" >Web API Setup</a>
+
+		<a id="04" href="#requirements" >iOS App Setup</a>
+		<div class="sub-menu">
+			<a id="003" href="#requirements">Requirements</a>
+			<hr>
+			<a id="004" href="#configuration">Configuration</a>
+			<hr>
+		</div>
+
+		<a id="05" href="#sources">Sources</a>
+		<hr>
+		<a id="06" href="#support">Support Desk</a>
+		<hr>
+		<a id="07" href="#versionhistory">Version History</a>
+		<hr>
+	</div>
+
+	<!-- Page content -->
+	<div class="container">
+		<div class="row">
+			<div class="col-lg-12 col-md-12 col-sm-12 col-12">	
+			  	<div class="heading">
+			  		<img class="icon" src="images/icon.png" alt="">
+			  		<h2>Sticker Store</h2>
+			  		<br>
+					<p>Firstly, big thanks for purchasing the <b>Sticker Store</b> application, your support is truly appreciated! If you have any questions that are beyond the scope of this documentation, please feel free to email via<a class="atv" href="http://loopinfosol.com/support/" target="_blank">Our Support Forum</a></p>
+				</div>
+			</div>
+		</div>
+		<br>
+		<div class="row" id="introduction">
+			<div class="col-lg-12 col-md-12 col-sm-12 col-12">
+				<div class="introduction">
+					<hr>
+					<h3>Introduction</h3>
+					<hr>
+					<div class="about-div">
+						<p><b>Item Name:</b> Sticker Store</p>
+						<p><b>Item Type:</b> Admin Panel + iOS Application</p>
+						<p><b>Author:</b> CrossMoon</p>
+						<p><b>Support Site:</b> <a class="atv" href="http://loopinfosol.com/support/" target="_blank">loopinfosol.com</a></p>
+					</div>
+					<br>
+					<p> This documentation will give you an understanding of how Sticker Store application is structured and, will help you regarding each step of customization. Please go through the documentation carefully to understand how this template is made and how to edit this properly.</p>
+					
+					<p>If you require further assistance, related to topics not covered in this documentation, then please contact us via<a class="atv" href="http://loopinfosol.com/support/" target="_blank">Our Support Forum</a></p>
+
+					<p>If you want to customize this product as per your requirement, please contact us here:<a class="atv" href="http://loopinfosol.com/support/" target="_blank">Support Forum</a></p>
+				</div>
+			</div>
+		</div>
+		<br>
+		<div class="row" id="components">
+			<div class="col-lg-12 col-md-12 col-sm-12 col-12">	
+				<div class="components">
+					<hr>
+					<h3>Components</h3>
+					<hr>					
+					<ol>
+				        <li>Open the <span class="atv">... /Main File</span> Folder to find all the Source Files</li>
+				        <li>Main File contains:
+					        <ul>
+					        	<li>
+					         		<i class="fa fa-folder-open-o"></i><span class="atv">Admin</span> - Backend Panel Source Code Folder
+					            </li>
+					            <li>
+					         		<i class="fa fa-folder-open-o"></i><span class="atv">Services</span> - Web API Source Code Folder
+					            </li>
+					         	<li>
+					         		<i class="fa fa-folder-open-o"></i><span class="atv">iOS</span> - iOS App Source Code Folder
+					            </li>
+                                <li>
+                                    <i class="fa fa-folder-open-o"></i><span class="atv">Database</span> - Application Database
+                                </li>
+					            <li>
+					            	<i class="fa fa-folder-open-o"></i><span class="atv">Documentation</span> - Documentation Folder
+					            </li>
+					        </ul>
+				        </li>
+				    </ol>								
+				</div>
+			</div>	
+		</div>
+		<br>
+
+		<div class="row" id="admin-requirements">
+			<div class="col-lg-12 col-md-12 col-sm-12 col-12">	
+				<div class="requirements">
+					<hr>
+					<h3>Requirements</h3>
+					<hr>					
+					<ul style="list-style-type:circle;">
+				        <li>PHP 5.4+ :<a class="atv" href="https://www.php.net/downloads.php" target="_blank"><u>Download</u></a></li>
+				        <li>MySqli:<a class="atv" href="https://www.mysql.com/downloads/" target="_blank"><u>Download</u></a></li>
+				    </ul>								
+				</div>
+			</div>	
+		</div>
+		<br>
+		<div class="row" id="admin-configuration">
+			<div class="col-lg-12 col-md-12 col-sm-12 col-12">	
+				<div class="configuration">
+					<hr>
+					<h3>Configuration</h3>
+					<hr>
+					<div class="section">
+						<p>➣ There are the Six thing to setup & run the plugin.</p>
+
+						<h6>1. Hosting Account <a class="click-a" href="#SI-hosting">Click</a></h6>
+						<h6>2. How to Setup Database <a class="click-a" href="#SI-db-setup">Click</a></h6>
+						<h6>3. How to Setup Admin Panel <a class="click-a" href="#SI-php-setup">Click</a></h6>
+						<h6>4. Configure Database Connection <a class="click-a" href="#SI-db-conn">Click</a></h6>
+						<h6>6. Run the plugin into browser <a class="click-a" href="#SI-run">Click</a></h6>
+				    </div>
+					<div class="section" id="SI-hosting">					
+						
+						<h4>A). Step-1 : Hosting Account</h4>
+						
+						<div class="main-section-1">
+							<p>➣ You must have <span class="f-red"><b>Hosting</b></span> account. And if you don't have please purchase it before move ahed. <a class="click-a" href="https://www.hostinger.in/web-hosting" target="_blank">Click</a></p>
+
+							<p class="notes">Note: I am just giving the example of Hostinger account. You can purchase any of hostinge account that support PHP.</p>
+
+							<p>➣ Get Login into your hostinger account and open dashboard.</p>
+
+							<img onclick="zoomImage('images/si-hosting-01.png')"  src="images/si-hosting-01.png" alt=""/>
+							<br><br>
+							<p class="notes">Now Hosting account end up here and move to the next step below..</p>
+						</div>	
+
+					</div>
+
+					<div class="section" id="SI-db-setup">
+
+						<h4>B). Step-2 : How to Setup Database</h4>
+						
+						<div class="main-section-1">
+								
+							<p>➣ From Dashboard Click on  <span class="f-red"><b>MySQL Database</b></span></p>
+							<img onclick="zoomImage('images/si-db-setup-1.png')"  src="images/si-db-setup-1.png" alt=""/>
+							<br>
+							<p>➣ Enter the <span class="f-red"><b>MySQL database name</b></span> & <span class="f-red"><b>MySQL username</b></span> & <span class="f-red"><b>Password</b></span></p>
+							<p>➣ After entering the required detail Click on <span class="f-red"><b>Create</b></span> button.</p>
+							<img onclick="zoomImage('images/si-db-setup-2.png')"  src="images/si-db-setup-2.png" alt=""/>
+
+							<br>
+							<p>➣ Select your new created Database & Click on <span class="f-red"><b>phpMyAdmin</b></span></p>
+						    <img onclick="zoomImage('images/si-db-setup-3.png')" src="images/si-db-setup-3.png"></img>
+							
+							<br>
+							<p>➣ Select your new created Database & Click on<span class="f-red"><b>Import</b></span> Sql database file.</p>
+						    <img onclick="zoomImage('images/si-db-setup-4.png')" src="images/si-db-setup-4.png"></img>
+
+							<br>
+						    <p>➣ Click on <span class="f-red"><b>Browse</b></span> button.</p>
+						    <img onclick="zoomImage('images/si-db-setup-5.png')" src="images/si-db-setup-5.png"></img>
+							
+							<br>
+							<p>➣ Select <span class="f-red"><b>StickerStore.sql</b></span> file and press <span class="f-red"><b>Go</b></span> button below left side.</p>
+						    <img onclick="zoomImage('images/si-db-setup-6.png')" src="images/si-db-setup-6.png"></img>
+						    
+							<br>
+							<p>➣ You will got the success message as shown in below image.</p>
+						    <img onclick="zoomImage('images/si-db-setup-7.png')" src="images/si-db-setup-7.png"></img>
+
+							<br><br>
+						    <p>➣ How to Configure Database Connection into php file. <a class="click-a" href="#SI-db-conn">Click</a></p>
+						  
+                        	<p class="notes">Now the Database setup is finished here & just moved to the next step below..</p>
+
+						</div>
+
+					</div>	
+					
+					<div class="section" id="SI-php-setup">
+
+						<h4>C). Step-3 : How to Setup Admin Panel</h4>
+						
+						<div class="main-section-1">
+								
+							<p>➣ From Dashboard Click on <span class="f-red"><b>File Manager</b></span> as show below image</p>
+							<img onclick="zoomImage('images/si-php-file-00.png')" src="images/si-php-file-00.png" alt=""/>
+							<br>
+							<p>➣ Now upload <span class="f-red"><b>admin.zip</b></span> folder into server</p>
+							<img onclick="zoomImage('images/si-php-file-01.png')" src="images/si-php-file-01.png" alt=""/>
+							<br>
+							<p>➣ After upload unzip this folder as shown below image</p>
+							<img onclick="zoomImage('images/si-php-file-02.png')" src="images/si-php-file-02.png" alt=""/>
+							<br>
+							<p class="notes">Now the Plugin Code setup is finished here move to the next step below..</p>
+
+						</div>
+
+					</div>	
+
+					<div class="section" id="SI-db-conn">
+
+						<h4>D). Step-4 : Configure Database Connection</h4>
+						
+						<div class="main-section-1">
+								
+							<p>➣ Open <span class="f-red"><b> <i class="fa fa-folder-open-o"></i> admin</b></span> > <span class="f-red"><b> <i class="fa fa-folder-open-o"></i> controller</b></span> > <span class="f-red"><b> dataController.php</b></span> file into code editor software and change the following credential as per Database.</p>
+																								
+
+<pre class="hljs" style="display: block; overflow-x: auto; padding: 0.5em; background: rgb(43, 43, 43) none repeat scroll 0% 0%; color: rgb(186, 186, 186);"><span class="hljs-comment" style="color: rgb(127, 127, 127);">//host , User , Pass , DB Name</span>
+$conn = <span class="hljs-keyword" style="color: rgb(203, 120, 50);">new</span> mysqli(<span class="hljs-string" style="color: rgb(224, 196, 108);">"localhost"</span>, <span class="hljs-string" style="color: rgb(224, 196, 108);">"root"</span>, <span class="hljs-string" style="color: rgb(224, 196, 108);">""</span>, <span class="hljs-string" style="color: rgb(224, 196, 108);">"wa_sticker"</span>);</pre>
+
+						</div>
+
+					</div>
+
+					<div class="section" id="SI-run">
+
+						<h4>E). Step-5 : </h4>
+						
+						<div class="main-section-1">
+								
+							<p>➣ Open <span class="f-red"><b> Browser</b></span> and run the Backend to type located plugin path : <span class="f-red"><b>http://www.domain.com/admin/</b></span> as show below image</p>
+							
+							<img onclick="zoomImage('images/si-run-admin.png')" src="images/si-run-admin.png" alt=""/>
+
+						</div>
+
+					</div>
+
+				</div>
+			</div>	
+		</div>
+		<br>
+		
+		<div class="row" id="api-configuration">
+			<div class="col-lg-12 col-md-12 col-sm-12 col-12">	
+				<div class="configuration">
+					<hr>
+					<h3>API Configuration</h3>
+					<hr>	
+					
+					<div class="section" id="SI-php-setup">
+
+						<h4>A). Step-1 : Setup Web API</h4>
+
+						<div class="main-section-1">
+							<p>➣ Get Login and Open Your hostinge account</p>	
+							<p>➣ From Dashboard Click on <span class="f-red"><b>File Manager</b></span> as show below image</p>
+							<img onclick="zoomImage('images/api-php-file-00.png')" src="images/api-php-file-00.png" alt=""/>
+							<br>
+							<p>➣ Now upload <span class="f-red"><b>services.zip</b></span> folder into server</p>
+							<img onclick="zoomImage('images/api-php-file-01.png')" src="images/api-php-file-01.png" alt=""/>
+							<br>
+							<p>➣ After upload unzip this folder as shown below image</p>
+							<img onclick="zoomImage('images/api-php-file-02.png')" src="images/api-php-file-02.png" alt=""/>
+							<br>
+							<p class="notes">Now the Plugin Code setup is finished here move to the next step below..</p>
+
+						</div>
+
+					</div>	
+
+					<div class="section" id="SI-db-conn">
+
+						<h4>B). Step-2 : Configure Database Connection</h4>
+						
+						<div class="main-section-1">
+								
+							<p>➣ Open <span class="f-red"><b> <i class="fa fa-folder-open-o"></i> services</b></span> > <span class="f-red"><b> <i class="fa fa-folder-open-o"></i> controller</b></span> > <span class="f-red"><b> dataController.php</b></span> file into code editor software and change the following credential as per Database.</p>
+																								
+
+<pre class="hljs" style="display: block; overflow-x: auto; padding: 0.5em; background: rgb(43, 43, 43) none repeat scroll 0% 0%; color: rgb(186, 186, 186);"><span class="hljs-comment" style="color: rgb(127, 127, 127);">//host , User , Pass , DB Name</span>
+$conn = <span class="hljs-keyword" style="color: rgb(203, 120, 50);">new</span> mysqli(<span class="hljs-string" style="color: rgb(224, 196, 108);">"localhost"</span>, <span class="hljs-string" style="color: rgb(224, 196, 108);">"root"</span>, <span class="hljs-string" style="color: rgb(224, 196, 108);">""</span>, <span class="hljs-string" style="color: rgb(224, 196, 108);">"wa_sticker"</span>);</pre>
+
+						</div>
+
+					</div>
+					
+					<div class="section" id="SI-db-conn">
+
+						<h4>C). Step-3 : Change an Image Folder Path Into</h4>
+						
+						<div class="main-section-1">
+							
+							<p>➣ Open <span class="f-red"><b> <i class="fa fa-folder-open-o"></i> services</b></span> > <span class="f-red"><b> <i class="fa fa-folder-open-o"></i> commonClass</b></span> > <span class="f-red"><b> commonVariable.php</b></span> file into code editor software and change the following credential as per custom location for that Image Folder.</p>
+								
+<pre class="hljs" style="display: block; overflow-x: auto; padding: 0.5em; background: rgb(34, 34, 34) none repeat scroll 0% 0%; color: rgb(170, 170, 170);"><span class="hljs-variable" style="color: rgb(187, 17, 102);">$domain_url</span> = <span class="hljs-string" style="color: rgb(255, 204, 51);">"http://localhost/CODE-CANYON/ios-app/images/"</span>;</pre>
+
+						</div>
+
+					</div>
+					
+					<div class="section" id="SI-db-conn">
+
+						<h4>C). Step-4 : Set Web API URL into Application.</h4>
+						
+						<div class="main-section-1">
+								
+							<p> Here you have the similler type of API link for example : <span class="f-red"><b> http://www.domain.com/services/ </span></b> and you need to set it into Application <a href="#set-api-link-app"><span class="f-red"><b> Set API URL </span></b></a></p>
+
+						</div>
+
+					</div>
+					
+				</div>		
+			</div>	
+		</div>
+		<br>
+
+		<div class="row" id="requirements">
+			<div class="col-lg-12 col-md-12 col-sm-12 col-12">	
+				<div class="requirements">
+					<hr>
+					<h3>Requirements</h3>
+					<hr>					
+					<ol>
+				        <li>Xcode 13+ :<a class="atv" href="https://stackoverflow.com/questions/10335747/how-to-download-xcode-dmg-or-xip-file" target="_blank"><u>Download</u></a></li>
+				        <li>Apple Developer Account:<a class="atv" href="https://developer.apple.com/programs/enroll/" target="_blank"><u>Create Account</u></a>
+				        </li>
+				    </ol>								
+				</div>
+			</div>	
+		</div>
+		<br>
+		<div class="row" id="configuration">
+			<div class="col-lg-12 col-md-12 col-sm-12 col-12">	
+				<div class="configuration">
+					<hr>
+					<h3>Configuration</h3>
+					<hr>
+					<div class="section">
+						<ol type="A">
+					        <li><a href="#open_app_xcode">Open iOS Application into Xcode</a></li>
+					        <li><a href="#app_id_xcode">Add Apple ID to Xcode</a></li>
+					        <li><a href="#basic_configuration">Basic Configuration</a></li>
+					        <li><a href="#set_app_icon">How to Set an Application Icon?</a></li>
+					        <li><a href="#app_customization">Application Customization</a></li>
+					        <li><a href="#one_signal">SetUp One Signal Notification</a></li>
+					        <li><a href="#set_admob">Setup AdMob</a></li>
+					        <li><a href="#certificate">Create Certificate</a></li>
+					        
+					        <ol type="I">
+					            <li><a href="#signing_request">Certificate Signing Request</a></li>
+					            <li><a href="#app_identifier">Register App Identifier</a></li>
+					            <li><a href="#generate_certificate">Generate Certificate</a></li>
+					            <li><a href="#notification_certificate">Generate Push Notification Certificate</a></li>
+					            <li><a href="#provisional_profile">Generate Provisional Profile</a></li>
+					        </ol>
+					        
+					    </ol>
+				    </div>
+					<div class="section" id="open_app_xcode">					
+						<h4>A). Open iOS Application into Xcode</h4>
+						<div class="main-section-1">
+							<p><b>Step 1:</b> Open project by double clicking on <span class="atv">Sticker.xcworkspace</span>  file as show in below image. ( Note : Don’t open “Sticker.xcodeproj” file.)</p>
+							<div class="sub-section-1"><img class="step-img" src="images/open_ios_app_1.png" alt=""></div>
+						</div>						
+					</div>
+					<div class="section" id="app_id_xcode">
+						<h4>B). Add Apple ID to Xcode</h4>
+						<div class="main-section-1">
+							<p><b>Step 1:</b> After opening project , Click on <span class="atv">Xcode</span> that on left-top side of the screen.</p>
+							<p><b>Step 2:</b> Click on <span class="atv">Preferences</span> from submenu as shown in below image.</p>
+							<div class="sub-section-1"><img class="step-img" src="images/add_apple_id_1_2.png" alt=""></div>
+							<p><b>Step 3:</b> Now click on<span class="atv">Accounts</span>.</p>
+							<p><b>Step 4:</b> Click on<span class="atv">+</span> button as shown in following image.</p>
+							<div class="sub-section-1"><img class="step-img" src="images/add_apple_id_3_4.png" alt=""></div>
+							<p><b>Step 5:</b> Now select<span class="atv">Apple ID</span>.</p>
+							<p><b>Step 6:</b> Click on<span class="atv">Continue</span> button as shown in following image.</p>
+							<div class="sub-section-1"><img class="step-img" src="images/add_apple_id_5_6.png" alt=""></div>
+							<p><b>Step 7:</b> Now enter your Apple ID and password and click on<span class="atv">NEXT</span> button as shown in following image. Now you can see your account in list.</p>
+							<div class="sub-section-1"><img class="step-img" src="images/add_apple_id_7.png" alt=""></div>	
+						</div>
+					</div>
+					<div class="section" id="basic_configuration">
+						<h4>C). Basic Configuration</h4>
+						<div class="main-section-1">
+							<p><b>Step 1:</b> Click on<span class="atv">Sticker</span>.</p>
+							<p><b>Step 2:</b> Click on<span class="atv">General</span> tab as shown in following image.</p>
+							<p><b>Step 3:</b> Now set<span class="atv">Display Name</span> that you want to show on phone screen when user install your application.</p>
+							<p><b>Step 4:</b> Set<span class="atv">Version</span> as “1.0”</p>
+							<p><b>Step 5:</b> Set<span class="atv">Build</span> as “1.0”</p>
+							<p><b>Step 6:</b> Select<span class="atv">Automatically manage Signing</span> option and select your team.</p>
+							<div class="sub-section-1"><img class="step-img" src="images/basic_configuration.png" alt=""></div>
+						</div>
+					</div>
+					<div class="section" id="set_app_icon">
+						<h4>D). How to Set an Application Icon?</h4>
+						<div class="main-section-1">
+							<p>Note : Right now its optional but its is necessary to change app icon to your app icon while uploading your application on store.</p>
+							<p><b>Step 1:</b> Click on <span class="atv">-></span> button under <span class="atv">App Icons Source</span> section as shown in following image. You need to upload <span class="atv">.appiconset</span> type here. Follow below step to make <span class="atv">.appiconset</span> file.</p>
+							<div class="sub-section-1"><img class="step-img" src="images/set_app_icon_1.png" alt=""></div>
+							<p><b>Step 2:</b> First create your icon as you want. But your icon must be in <span class="atv">.png</span> format and it must of 1024x1024 dimension.</p>
+							<p><b>Step 3:</b> Now Open <a class="atv" href="https://makeappicon.com/" target="_blank">https://makeappicon.com/</a> and upload your icon’s .png file and wait for some time.</p>
+							<p><b>Step 4:</b> Now write your Email ID in which you want to receive icon that can be set in application and click on download button.</p>
+							<p><b>Step 5:</b> After some time you will receive mail. So download that zip file and unzip it.</p>
+							<p><b>Step 6:</b> Now click on <span class="atv">ios</span> folder and find a folder named <span class="atv">AppIcon.appiconset</span> as shown in following image.</p>
+							<div class="sub-section-1"><img class="step-img" src="images/set_app_icon_6.png" alt=""></div>
+							<p><b>Step 7:</b> Now drag  that folder and drop into the project file as shown in following image.</p>
+							<div class="sub-section-1"><img class="step-img" src="images/set_app_icon_7.png" alt=""></div>
+						</div>
+					</div>
+					<div class="section" id="app_customization">
+						<h4>E). Application Customization</h4>
+						<div class="main-section-1">
+							<p>➣ After opening project , click on <span class="atv">Config.swift</span> file as shown in following image. </p>
+							<p>➣ You just need to edit <span class="atv">Config.swift</span> file to convert this app to your app. Please follow the below steps carefully.</p>
+							<div class="sub-section-1"><img class="step-img" src="images/app_customization.png" alt=""></div>
+							<p><b>Step 1: Set your Ad ID</b></p>
+							<ul>
+								<li>➣ Set your intrestial Ad ID here that you created while Admob Setup. <a href="#set_admob"><u>Create INTRESTIAL_Ad_ID</u></a></li>
+							</ul>
+							<div class="sub-section-1"><img class="step-img" src="images/change_admob_id.png" alt=""></div>
+								
+								
+							<p><b>Step 2: Set OneSignal Id</b></p>
+							<ul>
+								<li>➣ Set your OneSignal App ID here that you created while OneSignal Setup. <a href="#one_signal"><u>Create OneSignal AppID</u></a></li>
+							</ul>
+							<div class="sub-section-1"><img class="step-img" src="images/change_onesignal.png" alt=""></div>
+                            
+                            <p><b>Step 3: Set Application URL</b></p>
+                            <ul>
+                                <li>➣ Set your android and iPhone application URL here.</li>
+                            </ul>
+                            <div class="sub-section-1"><img class="step-img" src="images/app_url.png" alt=""></div>
+                            
+                            <p id="set-api-link-app"><b>Step 4: Set WebAPI URL</b></p>
+                            <ul>
+                                <li>➣ As shown in to the image you need Set WebAPI URL here. ( Before that you need to setup Web API <a class="click-a" href="#api-configuration"><u> How to Setup Web API?</u></a> )</li>
+                            </ul>
+                            <div class="sub-section-1"><img class="step-img" src="images/server_url.png" alt=""></div>
+                            
+						</div>
+					</div>
+                    
+					<div class="section" id="one_signal">
+						<h4>F). Setup One Signal Notification</h4>
+						<div class="main-section-1">
+							<p><b>Step 1:</b> Open this link <a class="atv" href="https://app.onesignal.com/login" target="_blank">https://app.onesignal.com/login</a>.</p>
+							<p><b>Step 2:</b> Sign In or Sign Up. After successfully SignIn, You get the following Home screen.</p>
+							<p><b>Step 3:</b> Click on <span class="atv">ADD APP</span> button.</p>
+							<div class="sub-section-1"><img class="step-img" src="images/one_signal_3.png" alt=""></div>
+							<p><b>Step 4:</b> You will get the popup and Enter name of your app.</p>
+							<p><b>Step 5:</b> Click on <span class="atv">ADD APP</span> button.</p>
+							<div class="sub-section-1"><img class="step-img" src="images/one_signal_4_5.png" alt=""></div>
+							<p><b>Step 6:</b> Now select <span class="atv">Apple iOS</span> as platform.</p>
+							<p><b>Step 7:</b> Click on <span class="atv">NEXT” button</span>.</p>
+							<div class="sub-section-1"><img class="step-img" src="images/one_signal_6_7.png" alt=""></div>
+							<p><b>Step 8:</b> Click on <span class="atv">Choose File</span> button and upload <span class="atv">.p12</span> file that we created before while making certificate. <a href="#certificate"><b><u>How To Generate .p12 file?</u></b></a></p>
+							<p><b>Step 9:</b> Click on <span class="atv">SAVE</span> button.</p>
+							<div class="sub-section-1"><img class="step-img" src="images/one_signal_8_9.png" alt=""></div>
+							<p><b>Step 10:</b> Select <span class="atv">Native iOS</span> as target SDK.</p>
+							<p><b>Step 11:</b> Click on <span class="atv">NEXT</span> button.</p>
+							<div class="sub-section-1"><img class="step-img" src="images/one_signal_10_11.png" alt=""></div>
+							<p><b>Step 12:</b> Now you can see <span class="atv">APP ID</span>. Copy this APP ID.</p>
+							<p><b>Step 13:</b> Now click on <span class="atv">x</span> button to close this popup. Then click on <span class="atv">LEAVE SETUP</span> button.</p>
+							<div class="sub-section-1"><img class="step-img" src="images/one_signal_12_13.png" alt=""></div>
+							<p><b>Step 14:</b> Now paste <span class="atv">APP ID</span> in <span class="atv">Config.swift</span> file as shown in following image.</p>
+							<div class="sub-section-1"><img class="step-img" src="images/one_signal_14.png" alt=""></div>
+							<p><b>Congratulations! You have successfully done with OneSignal Notification.</b></p>
+						</div>
+					</div>
+					<div class="section" id="set_admob">
+						<h4>G). Setup AdMob</h4>
+                        <div class="main-section-1">
+							<label><b>➣ </b> Open <a class="atv" href="https://admob.google.com" target="_blank">https://admob.google.com</a>.</label>
+							<br>							
+							<label><b>➣ </b> Sign In or Sign Up with your detail.</label>
+							
+							<p><b>Step 1:</b> Click on <span class="atv">Apps</span>.</p>
+							
+							<p><b>Step 2:</b> Click on <span class="atv">ADD APP</span> button.</p>
+							<div class="sub-section-1"><img class="step-img" src="images/admob_1_2.png" alt=""></div>
+								
+							<p><b>Step 3:</b> Click on <span class="atv">NO</span> button.</p>
+							<div class="sub-section-1"><img class="step-img" src="images/admob_3.png" alt=""></div>
+								
+							<p><b>Step 4:</b> Enter your app name.</p>
+							<p><b>Step 5:</b> select <span class="atv">iOS</span> as a platform.</p>
+							<p><b>Step 6:</b> Click on <span class="atv">ADD</span> button.</p>
+							<div class="sub-section-1"><img class="step-img" src="images/admob_4_5_6.png" alt=""></div>
+
+							<p><b>Step 7:</b> Now click on <span class="atv">CREATE AD UNIT</span> button.</p>
+							<div class="sub-section-1"><img class="step-img" src="images/admob_7.png" alt=""></div>
+								
+							<p><b>Step 8:</b> Now click on <span class="atv">SELECT</span> button under <span class="atv">Intrestial</span> section.</p>
+							<div class="sub-section-1"><img class="step-img" src="images/admob_8.png" alt=""></div>
+								
+							<p><b>Step 9:</b> Enter Ad Unit Name.</p>
+							<p><b>Step 10:</b> Click on <span class="atv">CREATE AD UNIT</span> button.</p>
+							<div class="sub-section-1"><img class="step-img" src="images/admob_9_10.png" alt=""></div>
+								
+							<p><b>Step 11:</b> Now copy Interstitial Ad ID.</p>
+							<div class="sub-section-1"><img class="step-img" src="images/admob_11.png" alt=""></div>
+								
+							<p><b>Step 12:</b> Now paste <span class="atv">Interstitial Ad ID</span> in <span class="atv">Config.swift</span> file as shown in following image.</p>
+							<div class="sub-section-1"><img class="step-img" src="images/admob_12.png" alt=""></div>
+								
+							<p><b>Congratulations. You have successfully done with AdMob  setup.</b></p>
+						</div>
+					</div>
+					<div class="section" id="certificate">
+						<h4>H). Create Certificate</h4>
+						<div id="signing_request" class="sub-section">
+							<h5>I). Certificate Signing Request</h5>
+							<div class="main-section-1">
+								<label><b>➣ </b> Open the Keychain Access utility.</label>
+								<p><b>Step 1:</b> At left top side , click on <span class="atv">Keychain Access</span>.</p>
+								<p><b>Step 2:</b> Click on <span class="atv">Certificate Assistance</span> from the menu.</p>
+								<p><b>Step 3:</b> Click on <span class="atv">Request a Certificate from Certificate Authority</span> from the sub menu.</p>
+								<div class="sub-section-1"><img class="step-img" src="images/certificate_request_1_2_3.png" alt=""></div>
+								<p><b>Step 4:</b> Enter User Email Address.</p>
+								<p><b>Step 5:</b> Enter common name as you want.</p>
+								<p><b>Step 6:</b> Then select <span class="atv">Save To Disk</span> option.</p>
+								<p><b>Step 7:</b> Click on <span class="atv">Continue</span>.</p>
+								<div class="sub-section-1"><img class="step-img" src="images/certificate_request_4_5_6_7.png" alt=""></div>
+								<p><b>Step 8:</b> It will ask you for storing this file. So give name of the file as you want and save it on Desktop.</p>
+								<p><b>Step 9:</b> Click on <span class="atv">Done” </span>button.</p>
+								<label>(NOTE : This <span class="atv">.certSigningRequest</span> file will be used later while making certificate).</label>
+							</div>
+						</div>
+						<div id="app_identifier" class="sub-section">
+							<h5>II). Register App Identifier</h5>
+							<div class="main-section-1">
+								<label><b>➣ </b> Open <a class="atv" href="https://developer.apple.com" target="_blank">https://developer.apple.com</a> in your browser. And click on <span class="atv">Account</span> tab.</label>
+								<label><b>➣ </b> Provide Application ID and password if you already have account. Otherwise you can create new account.</label>
+								<p><b>Step 1:</b> Click on <span class="atv">Certificates, Identifiers and Profiles</span>.</p>
+								<div class="sub-section-1"><img class="step-img" src="images/app_identifier_1.png" alt=""></div>
+								<p><b>Step 2:</b> Click on <span class="atv">Identifiers</span>.</p>
+								<p><b>Step 3:</b> Click on <span class="atv">+</span> button. You can see following screen as result. </p>
+								<div class="sub-section-1"><img class="step-img" src="images/app_identifier_2_3.png" alt=""></div>
+								<p><b>Step 4:</b> Select <span class="atv">App IDs</span>.</p>
+								<p><b>Step 5:</b> Click on <span class="atv">Continue</span> button.</p>
+								<div class="sub-section-1"><img class="step-img" src="images/app_identifier_4_5.png" alt=""></div>
+								<p><b>Step 6:</b> Select <span class="atv">iOS</span> as a Platform.</p>
+								<p><b>Step 7:</b> Click on <span class="atv">Continue</span> button.</p>
+								<p><b>Step 8:</b> Select <span class="atv">App IDs</span>.</p>
+								<p><b>Step 9:</b> Click on <span class="atv">Continue</span> button.</p>
+								<p><b>Step 10:</b> Select <span class="atv">App IDs</span>.</p>
+								<div class="sub-section-1"><img class="step-img" src="images/app_identifier_6_7_8_9_10.png" alt=""></div>
+								<p><b>Step 11:</b> Click on <span class="atv">Continue</span> button.</p>
+								<div class="sub-section-1"><img class="step-img" src="images/app_identifier_11.png" alt=""></div>
+								<label><b>Finally you register your AppID successfully.</b></label>
+							</div>
+						</div>
+						<div id="generate_certificate" class="sub-section">
+							<h5>III). Generate Certificate</h5>
+							<div class="main-section-1">
+								<p><b>Step 1:</b> Click on <span class="atv">Certificates</span> on the left side.</p>	
+								<p><b>Step 2:</b> Click on <span class="atv">+</span> button.</p>
+								<div class="sub-section-1"><img class="step-img" src="images/generate_certificate_1_2.png" alt=""></div>
+								<p><b>Step 3:</b> Select <span class="atv">Apple Distribution</span> option.</p>
+								<p><b>Step 4:</b> Click on <span class="atv">Continue</span> button.</p>
+								<div class="sub-section-1"><img class="step-img" src="images/generate_certificate_3_4.png" alt=""></div>
+								<p><b>Step 5:</b> It is asking you to upload a Certificate Signing Request. So upload <span class="atv">.certSigningRequest</span> file here that we made before.</p>
+								<p><b>Step 6:</b> Then click on “Continue” button. It will show you following screen.</p>
+								<div class="sub-section-1"><img class="step-img" src="images/generate_certificate_5_6.png" alt=""></div>
+								<p><b>Step 7:</b> Click on <span class="atv">Download</span> button.</p>
+								<div class="sub-section-1"><img class="step-img" src="images/generate_certificate_7.png" alt=""></div>
+								<p><b>Step 8:</b> Your certificate is generated successfully. Now go to <span class="atv">Download</span> folder and double click on that <span class="atv">distribution.cer</span> file to install that <span class="atv">distribution.cer</span> file in <span class="atv">Keychain Access utility</span>.</p>
+								<p><b>Step 9:</b> Once you double click on that file it will be installed in <span class="atv">Keychain Access utility</span>. So open <span class="atv">Keychain Access utility</span>.</p>
+								<p><b>Step 10:</b> Click on <span class="atv">Login</span> tab that is on left side.</p>
+								<p><b>Step 11:</b> Click on <span class="atv">Certificates</span> tab. It will show your file installed at right side. You can find your file by name or expires date.</p>
+								<div class="sub-section-1"><img class="step-img" src="images/generate_certificate_10_11.png" alt=""></div>
+							</div>
+						</div>
+						<div id="notification_certificate" class="sub-section">
+							<h5>IV). Generate Push Notification Certificate</h5>
+							<div class="main-section-1">
+								<p><b>Step 1:</b> Click on <span class="atv">Certificates</span> on the left side.</p>
+								<p><b>Step 2:</b> Click on <span class="atv">+</span> button.</p>
+								<div class="sub-section-1"><img class="step-img" src="images/notification_certificate_1_2.png" alt=""></div>
+								<p><b>Step 3:</b> Select “Apple Push Notification service SSL (Sandbox and Production)” option from the services.</p>
+								<p><b>Step 4:</b> Click on <span class="atv">Continue</span> button.</p>
+								<div class="sub-section-1"><img class="step-img" src="images/notification_certificate_3_4.png" alt=""></div>
+								<p><b>Step 5:</b> It is asking you to select your AppID that you made before. So select your AppID.</p>
+								<p><b>Step 6:</b> Click on <span class="atv">Continue</span> button.</p>
+								<div class="sub-section-1"><img class="step-img" src="images/notification_certificate_5_6.png" alt=""></div>
+								<p><b>Step 7:</b> It is asking you to upload a Certificate Signing Request. So upload<span class="atv"> “.certSigningRequest</span> file here that we made before.</p>
+								<p><b>Step 8:</b> Click on <span class="atv">Continue</span> button.</p>
+								<div class="sub-section-1"><img class="step-img" src="images/notification_certificate_7_8.png" alt=""></div>
+								<p><b>Step 9:</b> Click ob <span class="atv">Download</span> button.</p>
+								<div class="sub-section-1"><img class="step-img" src="images/notification_certificate_9.png" alt=""></div>
+								<p><b>Step 10:</b> Your notification certificate is generated successfully.Now go to <span class="atv">Download</span> folder and double click on that <span class="atv">aps.cer</span> file to install that <span class="atv">aps.cer</span> file in <span class="atv">Keychain Access utility</span>.</p>
+								<p><b>Step 11:</b> Once you double click on that file it will be installed in <span class="atv">Keychain Access utility</span>. So open<span class="atv"> “Keychain Access utility</span>.</p>
+								<p><b>Step 12:</b> Click on <span class="atv">Login</span> tab that is on left side.</p>
+								<p><b>Step 13:</b> Click on <span class="atv">Certificates</span> tab. It will show your file installed at right side. You can find your file by name or expires date.</p>
+								<div class="sub-section-1"><img class="step-img" src="images/notification_certificate_12_13.png" alt=""></div>
+								<p><b>Step 14:</b> Now find your file and right click on that file.</p>
+								<p><b>Step 15:</b> Click on <span class="atv">Export **</span> as shown in image and save this .p12 file with suitable name.</p>
+								<div class="sub-section-1"><img class="step-img" src="images/notification_certificate_14_15.png" alt=""></div>
+								<p><b>(NOTE : This “.p12” fill will be needed when you setup your application for One Signal Notification.)</b></p>
+							</div>
+						</div>
+						<div id="provisional_profile" class="sub-section">
+							<h5>V). Generate Provisional Profile</h5>
+							<div class="main-section-1">
+								<p><b>Step 1:</b> Click on <span class="atv">Profiles</span> on the left side.</p>
+								<p><b>Step 2:</b> Click on <span class="atv">+</span> button.</p>
+								<div class="sub-section-1"><img class="step-img" src="images/provisional_profile_1_2.png" alt=""></div>
+								<p><b>Step 3:</b> Select <span class="atv">App Store</span> option under Distribution section.</p>
+								<p><b>Step 4:</b> Click on <span class="atv">Continue</span> button.</p>
+								<div class="sub-section-1"><img class="step-img" src="images/provisional_profile_3_4.png" alt=""></div>
+								<p><b>Step 5:</b> It is asking you to select your AppID that you made before. So select your AppID.</p>
+								<p><b>Step 6:</b> Click on <span class="atv">Continue</span> button.</p>
+								<div class="sub-section-1"><img class="step-img" src="images/provisional_profile_5_6.png" alt=""></div>
+								<p><b>Step 7:</b> It asking you to select certificate. So select your certificate that you recently created.</p>
+								<p><b>Step 8:</b> Click on <span class="atv">Continue</span> button.</p>
+								<div class="sub-section-1"><img class="step-img" src="images/provisional_profile_7_8.png" alt=""></div>
+								<p><b>Step 9:</b> It will ask you for entering profile name. So enter name as you want.</p>
+								<p><b>Step 10:</b> Click on <span class="atv">Generate</span> button. Then click on “Download” button.</p>
+								<div class="sub-section-1"><img class="step-img" src="images/provisional_profile_9_10.png" alt=""></div>
+								<p><b>Step 11:</b> Your profile is generated successfully. Now go to “Download” folder and double click on that <span class="atv">.mobileprovision</span> file.</p>
+								<p><b>Step 12:</b> Click on <span class="atv">Add to Library</span> to install that “.mobileprovision” file in “IPhone Configuration Utility”.</p>
+								<div class="sub-section-1"><img class="step-img" src="images/provisional_profile_12.png" alt=""></div>
+								<p><b>Step 13:</b> Once you  click on <span class="atv">Add to Library</span>,  it will be installed in <span class="atv">IPhone Configuration Utility</span>. So open <span class="atv">IPhone Configuration Utility</span>.</p>
+								<p><b>Step 14:</b> Click on <span class="atv">Provisioning Profiles</span> that is on left side. So you can see list of profiles at right side. You can also see your profile in this list. You can find your file by name or expires date.</p>
+								<div class="sub-section-1"><img class="step-img" src="images/provisional_profile_14.png" alt=""></div>	
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>	
+		</div>
+		<br>
+
+		<div class="row" id="sources">
+			<div class="col-lg-12 col-md-12 col-sm-12 col-12">	
+				<div class="sources">
+					<hr>
+					<h3>Sources/Credits</h3>
+					<hr>					
+					<ol>
+				        <li>Google-Mobile-Ads-SDK:<a class="atv" href="https://developers.google.com/admob/ios/quick-start" target="_blank">Click Here.</a></li>
+				        <li>OneSignal:<a class="atv" href="https://documentation.onesignal.com/docs/ios-sdk-setup" target="_blank">Click Here.</a></li>
+					    <li>Alamofire:<a class="atv" href="https://github.com/Alamofire/Alamofire" target="_blank">Click Here.</a></li>
+                        <li>SwiftyJSON:<a class="atv" href="https://github.com/SwiftyJSON/SwiftyJSON" target="_blank">Click Here.</a></li>
+                        <li>SDWebImage:<a class="atv" href="https://github.com/SDWebImage/SDWebImage" target="_blank">Click Here.</a></li>
+                        <li>MBProgressHUD:<a class="atv" href="https://github.com/jdg/MBProgressHUD" target="_blank">Click Here.</a></li>
+				    </ol>								
+				</div>
+			</div>	
+		</div>
+		<br>
+		<div class="row" id="support">
+			<div class="col-lg-12 col-md-12 col-sm-12 col-12">
+				<div class="support">
+					<hr>
+					<h3>Support Desk</h3>
+					<hr>
+					<div class="sub-section">
+						<p>● Please remember you have purchased a very affordable application and you have not paid for a full-time app development agency. Occasionally we will help with small tweaks, but these requests will be put on a lower priority due to their nature. Please be patient, polite and respectful.</p>
+
+						<h4>Support for my items includes:</h4>
+						<p>● Responding to questions or problems regarding the item and its features.</p>
+						<p>● Fixing bugs and reported issues.</p>
+						<p>● Providing updates to ensure compatibility with new software versions</p>
+
+						<h4>Item support does not include:</h4>
+						<p>● Customization and installation services.</p>
+						<p>● Support for third party software and Service.</p>
+
+						<p>Have any queries related to Sticker Store Application. Feel free to contact our support: <a class="atv" href="http://loopinfosol.com/support/" target="_blank">loopinfosol.com</a>. We will try to help you as soon as possible.</p>
+					</div>
+				</div>
+			</div>	
+		</div>
+		<br>
+		<div class="row" id="versionhistory">
+			<div class="col-lg-12 col-md-12 col-sm-12 col-12">
+				<div class="versionhistory">
+					<hr>
+					<h3>Version History</h3>
+					<hr>
+					<p>Version 1.0 - Initial Release</p>
+				</div>
+			</div>	
+		</div>
+		<button onclick="topFunction()" id="myBtn" class="mybtn" title="Go to top">Top</button> 
+	</div>	
+</body>
+	
+	<!-- jQuery library -->
+	<script src="js/jquery.min.js"></script>
+
+	<!-- manual script to set open&close duration -->
+	<script>
+
+		$('a[href*="#"]').on('click', function(e) {
+		 	e.preventDefault()
+
+		 	var id = $(this).attr('id');
+		 	//alert(id);
+		 	if(id != undefined)
+		 	{
+		 		$("a").removeClass("active");
+		 		$("#"+id).addClass("active");
+		 	}
+
+		  	$('html, body').animate(
+		    {
+		     	scrollTop: $($(this).attr('href')).offset().top,
+
+		    },500,'linear')
+		})
+
+		// When the user scrolls down 20px from the top of the document, show the button
+		window.onscroll = function() {scrollFunction()};
+
+		function scrollFunction() {
+		  if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+		    document.getElementById("myBtn").style.display = "block";
+		  } else {
+		    document.getElementById("myBtn").style.display = "none";
+		  }
+		}
+
+		// When the user clicks on the button, scroll to the top of the document
+		function topFunction(){
+			
+		    $('html, body').animate({scrollTop : 0},700);
+		}
+
+	</script>
+
+</html>
