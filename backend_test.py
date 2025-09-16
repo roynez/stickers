@@ -823,8 +823,8 @@ class BackendTester:
             self.test_admin_profile_update()
             self.test_change_password()
             
-            # Test category creation (needed for packages)
-            self.test_categories_create()
+            # Setup test category (needed for packages)
+            self.test_categories_setup()
             
             # Test package CRUD operations
             self.test_packages_get()
