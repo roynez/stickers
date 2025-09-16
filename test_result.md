@@ -356,10 +356,7 @@ metadata:
 
 test_plan:
   current_focus:
-    - "File Upload Endpoints"
-    - "Horizontal Banners System"
-    - "Categories with Thumbnails"
-    - "Banner Analytics"
+    - "System Configuration API"
   stuck_tasks:
     - "System Configuration API"
   test_all: false
