@@ -1218,8 +1218,10 @@ class BackendTester:
             banner_data = {
                 "title": "Analytics Test Banner",
                 "description": "Testing analytics functionality",
-                "action_type": "url",
-                "action_value": "https://example.com",
+                "action": {
+                    "type": "external_link",
+                    "value": "https://example.com"
+                },
                 "is_active": True,
                 "priority": 1
             }
