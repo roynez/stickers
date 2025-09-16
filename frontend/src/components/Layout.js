@@ -13,7 +13,10 @@ import {
   Smartphone,
   Monitor,
   Crown,
-  Heart
+  Heart,
+  Banknote,
+  Bell,
+  Cog
 } from 'lucide-react';
 
 export default function Layout({ children }) {
@@ -27,6 +30,9 @@ export default function Layout({ children }) {
     { name: 'Subcategorías', href: '/subcategories', icon: Layers },
     { name: 'Stickers', href: '/stickers', icon: Sticker },
     { name: 'Suscripciones', href: '/subscriptions', icon: Crown, badge: 'Premium' },
+    { name: 'Banners', href: '/banners', icon: Banknote, badge: 'Nuevo' },
+    { name: 'Notificaciones', href: '/notifications', icon: Bell, badge: 'Push' },
+    { name: 'Sistema', href: '/system-config', icon: Cog, badge: 'Config' },
     { name: 'Configuración', href: '/settings', icon: Settings },
   ];
 
@@ -98,7 +104,7 @@ function SidebarContent({ navigation, location, admin, onLogout }) {
             </div>
           </div>
           <div className="ml-3">
-            <h1 className="text-lg font-semibold text-gray-900">Panel Unificado</h1>
+            <h1 className="text-lg font-semibold text-gray-900">Panel Avanzado</h1>
             <p className="text-xs text-gray-500">iOS & Android</p>
           </div>
         </div>
@@ -124,7 +130,13 @@ function SidebarContent({ navigation, location, admin, onLogout }) {
                 />
                 <span className="flex-1">{item.name}</span>
                 {item.badge && (
-                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-pink-100 text-pink-800">
+                  <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+                    item.badge === 'Premium' ? 'bg-pink-100 text-pink-800' :
+                    item.badge === 'Nuevo' ? 'bg-green-100 text-green-800' :
+                    item.badge === 'Push' ? 'bg-blue-100 text-blue-800' :
+                    item.badge === 'Config' ? 'bg-purple-100 text-purple-800' :
+                    'bg-gray-100 text-gray-800'
+                  }`}>
                     {item.badge}
                   </span>
                 )}

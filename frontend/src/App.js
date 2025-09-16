@@ -14,6 +14,9 @@ import SubCategories from './components/SubCategories';
 import Stickers from './components/Stickers';
 import Settings from './components/Settings';
 import Subscriptions from './components/Subscriptions';
+import SystemConfig from './components/SystemConfig';
+import Banners from './components/Banners';
+import Notifications from './components/Notifications';
 import Layout from './components/Layout';
 import { Toaster } from 'sonner';
 
@@ -98,6 +101,27 @@ function AppContent() {
           <ProtectedRoute>
             <Layout>
               <Subscriptions />
+            </Layout>
+          </ProtectedRoute>
+        } />
+        <Route path="/banners" element={
+          <ProtectedRoute>
+            <Layout>
+              <Banners />
+            </Layout>
+          </ProtectedRoute>
+        } />
+        <Route path="/notifications" element={
+          <ProtectedRoute>
+            <Layout>
+              <Notifications />
+            </Layout>
+          </ProtectedRoute>
+        } />
+        <Route path="/system-config" element={
+          <ProtectedRoute>
+            <Layout>
+              <SystemConfig />
             </Layout>
           </ProtectedRoute>
         } />
