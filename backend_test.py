@@ -1389,20 +1389,24 @@ class BackendTester:
             return False
     
     def run_all_tests(self):
-        """Run all backend tests for package-based system"""
-        print(f"🚀 Starting Backend Package System Tests for {BACKEND_URL}")
-        print("=" * 60)
+        """Run all backend tests including new banner and upload system"""
+        print(f"🚀 Starting Backend Tests (Package System + Banner/Upload System) for {BACKEND_URL}")
+        print("=" * 80)
         
         # Initialize admin first
         self.test_init_admin()
         
         # Test authentication
         if self.test_admin_login():
+            print("\n🔐 AUTHENTICATION TESTS")
+            print("-" * 40)
             # Test admin profile endpoints
             self.test_admin_profile_get()
             self.test_admin_profile_update()
             self.test_change_password()
             
+            print("\n📦 PACKAGE SYSTEM TESTS")
+            print("-" * 40)
             # Setup test category (needed for packages)
             self.test_categories_setup()
             
@@ -1417,6 +1421,30 @@ class BackendTester:
             # Test popularity system (likes and downloads)
             self.test_popularity_system()
             
+            print("\n🎨 NEW BANNER & UPLOAD SYSTEM TESTS")
+            print("-" * 40)
+            # Test upload configuration
+            self.test_upload_config()
+            
+            # Test file upload endpoints
+            self.test_banner_file_upload()
+            self.test_category_thumbnail_upload()
+            
+            # Test horizontal banners system
+            self.test_horizontal_banners_crud()
+            self.test_banner_image_upload_to_banner()
+            
+            # Test public banners endpoint
+            self.test_public_banners()
+            
+            # Test banner analytics
+            self.test_banner_analytics()
+            
+            # Test categories with thumbnails
+            self.test_categories_with_thumbnails()
+            
+            print("\n⚙️ SYSTEM CONFIGURATION TESTS")
+            print("-" * 40)
             # Test social media configuration
             self.test_social_media_config()
             
@@ -1430,15 +1458,17 @@ class BackendTester:
             # Test system configuration
             self.test_system_config()
             
+            print("\n🧹 CLEANUP")
+            print("-" * 40)
             # Cleanup - delete test package
             self.test_packages_delete()
         else:
             print("❌ Authentication failed - skipping authenticated tests")
         
         # Print summary
-        print("\n" + "=" * 60)
-        print("📊 TEST SUMMARY")
-        print("=" * 60)
+        print("\n" + "=" * 80)
+        print("📊 COMPREHENSIVE TEST SUMMARY")
+        print("=" * 80)
         
         passed = sum(1 for result in self.test_results if result["success"])
         total = len(self.test_results)
@@ -1454,6 +1484,13 @@ class BackendTester:
             print("\n❌ FAILED TESTS:")
             for test in failed_tests:
                 print(f"  - {test['test']}: {test['message']}")
+        
+        # Show successful banner/upload tests specifically
+        banner_upload_tests = [result for result in self.test_results if any(keyword in result['test'].lower() for keyword in ['banner', 'upload', 'thumbnail', 'category']) and result['success']]
+        if banner_upload_tests:
+            print(f"\n✅ BANNER & UPLOAD SYSTEM TESTS PASSED ({len(banner_upload_tests)} tests):")
+            for test in banner_upload_tests:
+                print(f"  - {test['test']}")
         
         return passed == total
 
