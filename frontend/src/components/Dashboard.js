@@ -57,7 +57,7 @@ export default function Dashboard() {
   }
 
   const getPopularityIcon = (rank) => {
-    if (rank.includes('🔥')) return <Fire className="h-5 w-5 text-red-500" />;
+    if (rank.includes('🔥')) return <Flame className="h-5 w-5 text-red-500" />;
     if (rank.includes('⭐')) return <Star className="h-5 w-5 text-yellow-500" />;
     if (rank.includes('📈')) return <TrendingUp className="h-5 w-5 text-green-500" />;
     if (rank.includes('👍')) return <Sparkles className="h-5 w-5 text-blue-500" />;
