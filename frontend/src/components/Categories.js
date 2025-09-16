@@ -209,58 +209,59 @@ export default function Categories() {
           ))}
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {filteredCategories.map((category) => (
-            <div key={category.id} className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-              {/* Category Image */}
-              <div className="h-32 bg-gradient-to-br from-blue-50 to-purple-50 flex items-center justify-center">
-                {category.image ? (
+            <div key={category.id} className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
+              {/* Category Thumbnail */}
+              <div className="aspect-square bg-gradient-to-br from-purple-50 to-blue-50 flex items-center justify-center relative">
+                {category.thumbnail_url ? (
                   <img
-                    src={category.image}
+                    src={category.thumbnail_url}
                     alt={category.name}
-                    className="h-full w-full object-cover"
+                    className="w-full h-full object-cover"
                   />
                 ) : (
-                  <FolderOpen className="h-12 w-12 text-gray-400" />
+                  <div className="text-center">
+                    <FolderOpen className="h-16 w-16 text-gray-400 mx-auto mb-2" />
+                    <p className="text-xs text-gray-500">Sin miniatura</p>
+                  </div>
+                )}
+                
+                {category.is_active ? (
+                  <div className="absolute top-2 right-2 bg-green-500 text-white p-1 rounded-full">
+                    <Eye className="h-3 w-3" />
+                  </div>
+                ) : (
+                  <div className="absolute top-2 right-2 bg-gray-400 text-white p-1 rounded-full">
+                    <EyeOff className="h-3 w-3" />
+                  </div>
                 )}
               </div>
 
               {/* Category Info */}
               <div className="p-4">
-                <div className="flex items-center justify-between mb-2">
-                  <h3 className="text-lg font-semibold text-gray-900 truncate">
+                <div className="mb-3">
+                  <h3 className="text-lg font-semibold text-gray-900 truncate mb-1">
                     {category.name}
                   </h3>
-                  <div className="flex items-center gap-1">
-                    {category.is_active ? (
-                      <Eye className="h-4 w-4 text-green-500" />
-                    ) : (
-                      <EyeOff className="h-4 w-4 text-gray-400" />
-                    )}
-                  </div>
+                  {category.description && (
+                    <p className="text-sm text-gray-600 line-clamp-2">{category.description}</p>
+                  )}
                 </div>
 
-                {/* Platforms */}
-                <div className="flex items-center gap-2 mb-4">
-                  {category.platforms.includes('ios') && (
-                    <div className="flex items-center gap-1 bg-blue-100 text-blue-700 px-2 py-1 rounded-full text-xs">
-                      <Smartphone className="h-3 w-3" />
-                      iOS
-                    </div>
-                  )}
-                  {category.platforms.includes('android') && (
-                    <div className="flex items-center gap-1 bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs">
-                      <Monitor className="h-3 w-3" />
-                      Android
-                    </div>
-                  )}
+                {/* Stats */}
+                <div className="flex items-center gap-4 mb-3 text-sm text-gray-600">
+                  <div className="flex items-center gap-1">
+                    <Package className="h-4 w-4" />
+                    <span>{category.package_count || 0} paquetes</span>
+                  </div>
                 </div>
 
                 {/* Actions */}
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => openModal(category)}
-                    className="flex-1 flex items-center justify-center gap-2 bg-gray-100 text-gray-700 px-3 py-2 rounded-lg hover:bg-gray-200 transition-colors"
+                    className="flex-1 flex items-center justify-center gap-2 bg-gray-100 text-gray-700 px-3 py-2 rounded-lg hover:bg-gray-200 transition-colors text-sm"
                   >
                     <Edit2 className="h-4 w-4" />
                     Editar
