@@ -31,7 +31,7 @@ export default function Categories() {
   });
 
   useEffect(() => {
-    fetchCategories();
+    fetchData();
   }, []);
 
   const fetchData = async () => {
